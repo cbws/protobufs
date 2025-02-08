@@ -1,0 +1,231 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "cbws/compute/v1alpha1/machine.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/field_mask.proto";
+
+// Manages virtual machines, the machine types they run on and the images they
+// boot from.
+service ComputeService {
+  option (google.api.default_host) = "compute.cbws.cloud";
+
+  // Lists the machines in a project.
+  rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/machines"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets a machine.
+  rpc GetMachine(GetMachineRequest) returns (Machine) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Creates a machine and starts it.
+  rpc CreateMachine(CreateMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*}/machines"
+      body: "machine"
+    };
+    option (google.api.method_signature) = "parent,machine,machine_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "Machine"
+      metadata_type: "cbws.compute.v1alpha1.CreateMachineMetadata"
+    };
+  }
+
+  // Stops a machine. The machine keeps its disk and can be started again.
+  rpc StopMachine(StopMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/machines/*}:stop"
+      body: "machine"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "StopMachineResponse"
+      metadata_type: "cbws.compute.v1alpha1.StopMachineMetadata"
+    };
+  }
+
+  // Starts a stopped machine.
+  rpc StartMachine(StartMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/machines/*}:start"
+      body: "machine"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "StartMachineResponse"
+      metadata_type: "cbws.compute.v1alpha1.StartMachineMetadata"
+    };
+  }
+
+  // Power-cycles a machine, like pressing its reset button. The operating
+  // system is not shut down first.
+  rpc ResetMachine(ResetMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/machines/*}:reset"
+      body: "machine"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "ResetMachineResponse"
+      metadata_type: "cbws.compute.v1alpha1.ResetMachineMetadata"
+    };
+  }
+
+  // Deletes a machine and its disk.
+  rpc DeleteMachine(DeleteMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {delete: "/v1/{name=projects/*/machines/*}"};
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "cbws.compute.v1alpha1.DeleteMachineMetadata"
+    };
+  }
+}
+
+// The request to list machines.
+message ListMachinesRequest {
+  // Required. The project to list the machines of, such as
+  // `projects/my-project-123`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Optional. The maximum number of machines to return. The service may
+  // return fewer. Get further machines by passing
+  // [ListMachinesResponse.next_page_token][cbws.compute.v1alpha1.ListMachinesResponse.next_page_token]
+  // in a subsequent request.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The page token returned in an earlier
+  // [ListMachinesResponse.next_page_token][cbws.compute.v1alpha1.ListMachinesResponse.next_page_token].
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: `machines.image`, `machines.type` and `machines.status`, which
+  // fills in each machine's `state`. Other fields are always returned. Without
+  // a mask, all three are read.
+  google.protobuf.FieldMask read_mask = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The response to a request to list machines.
+message ListMachinesResponse {
+  // The machines in the project.
+  repeated Machine machines = 1;
+
+  // To retrieve the next page of results, set
+  // [ListMachinesRequest.page_token][cbws.compute.v1alpha1.ListMachinesRequest.page_token]
+  // to this value. Empty on the last page.
+  string next_page_token = 2;
+}
+
+// The request to get a machine.
+message GetMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: `image`, `type` and `status`, which fills in `state`. Other
+  // fields are always returned. Without a mask, all three are read.
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The request to create a machine.
+message CreateMachineRequest {
+  // Required. The project to create the machine in, such as
+  // `projects/my-project-123`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Required. The id of the machine, which becomes the last segment of its
+  // name. It contains letters, digits and hyphens and ends with a letter or a
+  // digit. Some machine types also require a lowercase id of at most 63
+  // characters that starts with a letter or a digit.
+  string machine_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The machine to create.
+  Machine machine = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Not returned by any method: a create machine operation returns the
+// [Machine][cbws.compute.v1alpha1.Machine] as its result.
+message CreateMachineResponse {}
+
+// The metadata of a create machine operation.
+message CreateMachineMetadata {
+  // The state of the machine as the operation last saw it.
+  Machine.State state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// The request to stop a machine.
+message StopMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The result of a stop machine operation.
+message StopMachineResponse {}
+
+// The metadata of a stop machine operation.
+message StopMachineMetadata {}
+
+// The request to start a machine.
+message StartMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The result of a start machine operation.
+message StartMachineResponse {}
+
+// The metadata of a start machine operation.
+message StartMachineMetadata {}
+
+// The request to reset a machine.
+message ResetMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The result of a reset machine operation.
+message ResetMachineResponse {}
+
+// The metadata of a reset machine operation.
+message ResetMachineMetadata {}
+
+// The request to delete a machine.
+message DeleteMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The metadata of a delete machine operation.
+message DeleteMachineMetadata {}

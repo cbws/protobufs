@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A virtual machine.
+message Machine {
+  option (google.api.resource) = {
+    type: "compute.cbws.xyz/Machine"
+    pattern: ["projects/{project}/machines/{name}"]
+  };
+
+  // The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`. On create, it is made from the
+  // request's `parent` and `machine_id`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The project that holds the machine, such as `projects/my-project-123`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The machine type, such as `zones/nl-ein-1/types/g4.2`. The zone of the
+  // type is the zone the machine runs in. On create, `machineTypes/g4.2` lets
+  // CBWS choose a zone that offers the type. Change it with ResizeMachine.
+  string type = 3 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The hostname the machine boots with. Defaults to the machine id.
+  string hostname = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // The IPv4 address the machine holds. Empty on a machine with no IPv4 address.
+  string address = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Public keys installed for the image's default user when the machine first boots.
+  //
+  // Accepted on create and never returned, so a machine read back always reports this
+  // empty. Keep your own record of the keys you sent.
+  repeated string ssh_keys = 9 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The cloud-init userdata the machine first boots with, delivered to it unchanged.
+  //
+  // Accepted on create and never returned, by the machine or by any operation that reports it.
+  // Userdata commonly carries credentials, and anything returned is readable by everyone who can
+  // read the machine or its operations. Keep your own record of the userdata you sent.
+  string userdata = 16 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The current state of the machine. Unset when the request's read mask
+  // leaves out `status`.
+  State state = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The state of a machine.
+  enum State {
+    // The state was not read, or it is none of the states below, such as
+    // a machine in an error state.
+    STATE_UNSPECIFIED = 0;
+
+    // The machine is being created.
+    STATE_PROVISIONING = 1;
+
+    // The machine is being prepared to run, for example while it boots
+    // for the first time, is reinstalled or is resized.
+    STATE_STAGING = 2;
+
+    // The machine is running.
+    STATE_RUNNING = 3;
+
+    // The machine is stopping.
+    STATE_STOPPING = 4;
+
+    // The machine is being suspended.
+    STATE_SUSPENDING = 5;
+
+    // The machine is suspended or paused, and does not run.
+    STATE_SUSPENDED = 6;
+
+    // The machine is being repaired.
+    STATE_REPAIRING = 7;
+
+    // The machine is stopped. It still exists, keeps its disk and can be
+    // started again.
+    STATE_TERMINATED = 8;
+  }
+}

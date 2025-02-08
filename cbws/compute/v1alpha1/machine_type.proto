@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A size of machine, offered in one or more zones.
+message MachineType {
+  option (google.api.resource) = {
+    type: "compute.cbws.xyz/MachineType"
+    pattern: ["projects/{project}/zones/{zone}/machinesType/{name}"]
+  };
+
+  // The resource name of the machine type, such as
+  // `zones/nl-ein-1/types/g4.2`.
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The zone the machine type is offered in, such as `nl-ein-1`.
+  string zone = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The number of virtual CPU cores of the machine.
+  int32 cpu = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The memory of the machine, in MB.
+  int32 memory_mb = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The size of the machine's local disk, in GB. The disk is not a volume:
+  // it exists only as long as the machine does.
+  int32 ephemeral_disk_gb = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
