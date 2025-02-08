@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package cbws.iam.policy.v1alpha1;
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/iam/policy/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.iam.policy.v1alpha1";
+option php_metadata_namespace = "Cbws\\IAM\\Policy\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\IAM\\Policy\\GRPC\\V1alpha1";
+
+// An IAM policy: who has which role on a resource.
+//
+// A policy is a list of `bindings`. A binding grants one `role` to one or
+// more `members`. A role is a named set of permissions.
+//
+// A policy on a resource also applies to the resources under it. A binding
+// on a project, for example, reaches every resource in that project.
+//
+// A policy can hold bindings that CBWS adds. A new project's policy, for
+// example, grants `roles/tech-support` to a CBWS support principal.
+//
+// **JSON example**
+//
+//     {
+//       "bindings": [
+//         {
+//           "role": "roles/owner",
+//           "members": [
+//             "user:alice@example.com",
+//             "group:admins@example.com"
+//           ]
+//         },
+//         {
+//           "role": "services/iam.cbws.xyz/roles/service-account-token-creator",
+//           "members": [
+//             "serviceAccount:my-app@my-project.iam-sa.cbws.xyz"
+//           ]
+//         }
+//       ],
+//       "etag": "..."
+//     }
+message Policy {
+  // The role bindings of the policy.
+  repeated Binding bindings = 4;
+
+  // An opaque version of the policy, used to avoid lost updates.
+  //
+  // Get the policy, change it, and set it with the `etag` you got. If the
+  // policy changed in between, the set fails with ABORTED, and you get the
+  // policy again and reapply your change. Without an `etag`, the set
+  // replaces whatever policy is stored.
+  //
+  // A resource that has no policy yet returns no `etag`.
+  bytes etag = 3;
+}
+
+// Grants a role to a set of members.
+message Binding {
+  // The role to grant. A predefined role is written as `roles/{role}`, such
+  // as `roles/owner`. A role defined by a service is written as
+  // `services/{service}/roles/{role}`, such as
+  // `services/iam.cbws.xyz/roles/service-account-token-creator`. An unknown
+  // role fails with FAILED_PRECONDITION.
+  string role = 1;
+
+  // A description of the binding, for your own reference.
+  string description = 3;
+
+  // The identities the role is granted to. Each member is one of:
+  //
+  // * `allUsers`: anyone who is signed in with a CBWS user account or a
+  //   service account.
+  // * `user:{email}`: a user account, such as `user:alice@example.com`.
+  // * `serviceAccount:{email}`: a service account, such as
+  //   `serviceAccount:my-app@my-project.iam-sa.cbws.xyz`.
+  // * `group:{email}`: a group, such as `group:admins@example.com`.
+  // * `principal:{id}`: any identity by its unique ID, a lowercase UUID.
+  //   Use it when you know the ID but not the email address. A policy that
+  //   is read back shows a member in this form when it has no email
+  //   address.
+  //
+  // A member whose email address is unknown, or whose kind does not match
+  // its prefix, fails with FAILED_PRECONDITION. Any other form fails with
+  // INVALID_ARGUMENT.
+  repeated string members = 2;
+}

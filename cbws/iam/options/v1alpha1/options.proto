@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package cbws.iam.options.v1alpha1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/iam/options/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.iam.options.v1alpha1";
+option php_metadata_namespace = "Cbws\\IAM\\Options\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\IAM\\Options\\GRPC\\V1alpha1";
+
+extend google.protobuf.ServiceOptions {
+  Service service = 56111;
+}
+
+extend google.protobuf.MethodOptions {
+  string resource_type = 56112;
+
+  string action = 56113;
+}
+
+extend google.protobuf.FieldOptions {
+  ResourceField iam_field = 56114;
+}
+
+// The IAM service an API belongs to.
+message Service {
+  // The IAM service name, such as `projects.cbws.xyz`.
+  string service = 1;
+}
+
+// What a request field marked with `iam_field` holds.
+enum ResourceField {
+  // Not specified.
+  RESOURCE_FIELD_UNSPECIFIED = 0;
+
+  // The resource name of an organization.
+  RESOURCE_FIELD_ORGANIZATION_NAME = 1;
+
+  // The resource name of a project, such as `projects/my-project`.
+  RESOURCE_FIELD_PROJECT_NAME = 2;
+
+  // The resource name of the resource itself.
+  RESOURCE_FIELD_NAME = 3;
+
+  // The unique ID of an organization.
+  RESOURCE_FIELD_ORGANIZATION_ID = 11;
+
+  // The unique ID of a project.
+  RESOURCE_FIELD_PROJECT_ID = 21;
+
+  // The unique ID of the resource itself.
+  RESOURCE_FIELD_ID = 31;
+}

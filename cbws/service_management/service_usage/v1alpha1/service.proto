@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package cbws.service_management.service_usage.v1alpha1;
+
+import "google/api/resource.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/service-usage/v1alpha1";
+option php_metadata_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1";
+
+// A CBWS service as seen from one project, with whether it is enabled there.
+message Service {
+  option (google.api.resource) = {
+    type: "serviceusage.cbws.xyz/Service"
+    pattern: ["projects/{project}/services/{service_account}"]
+  };
+
+  // The resource name of the service in the project, in the form
+  // `projects/{project}/services/{service}`, such as
+  // `projects/my-project/services/logging.cbws.xyz`.
+  string name = 1;
+
+  // The project, such as `projects/my-project`.
+  string parent = 2;
+
+  // The name and title of the service.
+  ServiceConfig config = 3;
+
+  // Whether the service is enabled in the project.
+  ServiceState state = 4;
+}
+
+// The name and title of a service.
+message ServiceConfig {
+  // The name of the service, such as `logging.cbws.xyz`. It is the last
+  // segment of the service's resource name.
+  string name = 1;
+
+  // The human-readable title of the service.
+  string title = 2;
+}
+
+// Whether a service is enabled in a project.
+enum ServiceState {
+  // Not specified. Not returned by the service.
+  SERVICE_STATE_UNSPECIFIED = 0;
+
+  // The service is not enabled in the project, and can be enabled with
+  // [EnableService][cbws.service_management.service_usage.v1alpha1.ServiceUsageService.EnableService].
+  SERVICE_STATE_DISABLED = 1;
+
+  // The service is enabled in the project and can be used.
+  SERVICE_STATE_ENABLED = 2;
+}

@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package cbws.projects.v1alpha1;
+
+import "cbws/iam/options/v1alpha1/options.proto";
+import "cbws/iam/policy/v1alpha1/policy.proto";
+import "cbws/iam/policy/v1alpha1/request_response.proto";
+import "cbws/projects/v1alpha1/project.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/projects/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.projects.v1alpha1";
+option php_metadata_namespace = "Cbws\\Projects\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\Projects\\GRPC\\V1alpha1";
+
+// Manages projects and their IAM policies.
+service ProjectsService {
+  option (google.api.default_host) = "projects.cbws.xyz";
+  option (cbws.iam.options.v1alpha1.service) = {service: "projects.cbws.xyz"};
+
+  // Creates a project in an organization and returns it. Requires
+  // `projects.cbws.xyz/Project/create` on the organization.
+  //
+  // The new project's IAM policy has two bindings: the caller gets the
+  // `roles/owner` role, and a CBWS support principal gets the
+  // `roles/tech-support` role, so that CBWS support can help with the
+  // project. Both show in
+  // [GetPolicy][cbws.projects.v1alpha1.ProjectsService.GetPolicy].
+  rpc CreateProject(CreateProjectRequest) returns (Project) {
+    option (google.api.http) = {
+      post: "/v1alpha1/projects"
+      body: "*"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "create";
+  }
+
+  // Lists the projects the caller has `projects.cbws.xyz/Project/get` on,
+  // either on the project itself or on its organization.
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
+    option (google.api.http) = {get: "/v1alpha1/projects"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Gets a project. Requires `projects.cbws.xyz/Project/get` on the
+  // project.
+  rpc GetProject(GetProjectRequest) returns (Project) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*}"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "get";
+  }
+
+  // Updates a project and returns it. Requires
+  // `projects.cbws.xyz/Project/update` on the project. Only the display
+  // name can be changed.
+  rpc UpdateProject(UpdateProjectRequest) returns (Project) {
+    option (google.api.http) = {
+      post: "/v1alpha1/projects"
+      body: "*"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "update";
+  }
+
+  // Deletes a project. Requires `projects.cbws.xyz/Project/delete` on the
+  // project.
+  //
+  // A project that still has services enabled cannot be deleted: the call
+  // fails with FAILED_PRECONDITION. Disable every service first.
+  //
+  // The returned operation is already done, and its response is empty.
+  rpc DeleteProject(DeleteProjectRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {delete: "/v1alpha1/{name=projects/*}"};
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "cbws.projects.v1alpha1.DeleteProjectMetadata"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
+  }
+
+  // Gets the IAM policy of a project. Requires
+  // `projects.cbws.xyz/Project/getIAMPolicy` on the project. The `resource`
+  // is the project's resource name, such as `projects/my-project`.
+  //
+  // A new project's policy holds a `roles/tech-support` binding for a CBWS
+  // support principal, which
+  // [CreateProject][cbws.projects.v1alpha1.ProjectsService.CreateProject]
+  // adds. Setting a policy without that binding removes CBWS support's
+  // access to the project.
+  rpc GetPolicy(cbws.iam.policy.v1alpha1.GetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {post: "/v1alpha1/{resource}:getPolicy"};
+    option (google.api.method_signature) = "resource";
+  }
+
+  // Replaces the IAM policy of a project. Requires
+  // `projects.cbws.xyz/Project/setIAMPolicy` on the project. The `resource`
+  // is the project's resource name, such as `projects/my-project`.
+  rpc SetPolicy(cbws.iam.policy.v1alpha1.SetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource}:setPolicy"
+      body: "*"
+    };
+    option (google.api.method_signature) = "resource,policy";
+  }
+
+  // Returns which of the given permissions the caller has on a project. The
+  // `resource` is the project's resource name, such as
+  // `projects/my-project`.
+  rpc TestPermissions(cbws.iam.policy.v1alpha1.TestPermissionsRequest) returns (cbws.iam.policy.v1alpha1.TestPermissionsResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource}:testPermissions"
+      body: "*"
+    };
+    option (google.api.method_signature) = "resource,permissions";
+  }
+}
+
+// The project create request.
+message CreateProjectRequest {
+  // Required. The organization to create the project in, as a full resource
+  // name in the form
+  // `//organizations.cloudbear.nl/organizations/{organization}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "organizations.cloudbear.nl/Organization"}
+  ];
+
+  // Required. The ID of the project, without the `projects/` prefix, such
+  // as `my-project`. It is unique across CBWS and cannot be changed. It is
+  // at most 32 characters long, and matches the regular expression
+  // `[a-z][a-zA-Z0-9-]*[a-zA-Z0-9]`. An ID that is already taken fails with
+  // FAILED_PRECONDITION.
+  string name = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The properties of the new project. Only `display_name` is
+  // read.
+  Project project = 3;
+}
+
+// The project list request.
+message ListProjectsRequest {
+  // Optional. The maximum number of projects to return. The default is 10.
+  int32 page_size = 2;
+
+  // Optional. The
+  // [next_page_token][cbws.projects.v1alpha1.ListProjectsResponse.next_page_token]
+  // of a previous response, to get the next page.
+  string page_token = 3;
+}
+
+// The project list response.
+message ListProjectsResponse {
+  // The projects, in no particular order.
+  repeated Project projects = 1;
+
+  // The token to get the next page with, by setting it as
+  // [page_token][cbws.projects.v1alpha1.ListProjectsRequest.page_token].
+  // Empty on the last page.
+  string next_page_token = 2;
+}
+
+// The project get request.
+message GetProjectRequest {
+  // Required. The resource name of the project, such as
+  // `projects/my-project`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+}
+
+// The project update request.
+message UpdateProjectRequest {
+  // Required. The project to update. Its `name` says which project, such as
+  // `projects/my-project`.
+  Project project = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The fields to update. The only accepted path is
+  // `display_name`. Any other path fails with INVALID_ARGUMENT.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// The project delete request.
+message DeleteProjectRequest {
+  // Required. The resource name of the project, such as
+  // `projects/my-project`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+}
+
+// The metadata of a project delete operation. It has no fields.
+message DeleteProjectMetadata {}

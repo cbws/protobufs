@@ -1,0 +1,309 @@
+syntax = "proto3";
+
+package cbws.iam.v1alpha1;
+
+import "cbws/iam/options/v1alpha1/options.proto";
+import "cbws/iam/policy/v1alpha1/policy.proto";
+import "cbws/iam/policy/v1alpha1/request_response.proto";
+import "cbws/iam/v1alpha1/service_account.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/iam/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.iam.v1alpha1";
+option php_metadata_namespace = "Cbws\\IAM\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\IAM\\GRPC\\V1alpha1";
+
+// Manages service accounts and their keys, and issues credentials for them.
+//
+// A service account is an identity for a workload rather than a person. It
+// belongs to a project, and is named by its email address, such as
+// `projects/my-project/serviceAccounts/my-app@my-project.iam-sa.cbws.xyz`.
+service IAMService {
+  option (google.api.default_host) = "iam.cbws.xyz";
+  option (cbws.iam.options.v1alpha1.service) = {service: "iam.cbws.xyz"};
+
+  // Lists the service accounts of a project. Requires
+  // `iam.cbws.xyz/ServiceAccount/list` on the project.
+  rpc ListServiceAccounts(ListServiceAccountsRequest) returns (ListServiceAccountsResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/serviceAccounts"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "list";
+  }
+
+  // Gets a service account. Requires `iam.cbws.xyz/ServiceAccount/get` on
+  // the service account.
+  rpc GetServiceAccount(GetServiceAccountRequest) returns (ServiceAccount) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/serviceAccounts/*}"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "get";
+  }
+
+  // Creates a service account in a project and returns it. Requires
+  // `iam.cbws.xyz/ServiceAccount/create` on the project.
+  //
+  // The new account gets a system-managed key straight away, so it can
+  // sign and get access tokens without a user-managed key.
+  rpc CreateServiceAccount(CreateServiceAccountRequest) returns (ServiceAccount) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*}/serviceAccounts"
+      body: "*"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "create";
+  }
+
+  // Deletes a service account and all of its keys. Requires
+  // `iam.cbws.xyz/ServiceAccount/delete` on the service account.
+  //
+  // Role bindings that name the account on other resources are not
+  // removed. Remove them from those resources' policies.
+  rpc DeleteServiceAccount(DeleteServiceAccountRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/{name=projects/*/serviceAccounts/*}"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
+  }
+
+  // Generates an OAuth 2.0 access token for a service account, valid for
+  // one hour. Requires `iam.cbws.xyz/ServiceAccount/generateAccessToken` on
+  // the service account.
+  rpc GenerateAccessToken(GenerateAccessTokenRequest) returns (GenerateAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/serviceAccounts/*}:generateAccessToken"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,delegates,scope,lifetime";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "generateAccessToken";
+  }
+
+  // Lists the keys of a service account, newest first. Requires
+  // `iam.cbws.xyz/ServiceAccountKey/list` on the service account.
+  //
+  // A key is listed once its validity has started. The listed keys carry
+  // no key material. Use
+  // [GetServiceAccountKey][cbws.iam.v1alpha1.IAMService.GetServiceAccountKey]
+  // for a key's public key.
+  rpc ListServiceAccountKeys(ListServiceAccountKeysRequest) returns (ListServiceAccountKeysResponse) {
+    option (google.api.http) = {get: "/v1/{parent=projects/*/serviceAccounts/*}/keys"};
+    option (google.api.method_signature) = "name,key_types";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
+    option (cbws.iam.options.v1alpha1.action) = "list";
+  }
+
+  // Gets a service account key with its public key. Requires
+  // `iam.cbws.xyz/ServiceAccountKey/get` on the key.
+  rpc GetServiceAccountKey(GetServiceAccountKeyRequest) returns (ServiceAccountKey) {
+    option (google.api.http) = {get: "/v1/{name=projects/*/serviceAccounts/*/keys/*}"};
+    option (google.api.method_signature) = "name,public_key_type";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
+    option (cbws.iam.options.v1alpha1.action) = "get";
+  }
+
+  // Creates a user-managed key for a service account and returns it with
+  // its private key. Requires `iam.cbws.xyz/ServiceAccountKey/create` on
+  // the service account.
+  //
+  // The private key is returned only in this response. CBWS does not keep
+  // it, so store it safely: it lets anyone who holds it act as the service
+  // account.
+  rpc CreateServiceAccountKey(CreateServiceAccountKeyRequest) returns (ServiceAccountKey) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/serviceAccounts/*}/keys"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,private_key_type,key_algorithm";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
+    option (cbws.iam.options.v1alpha1.action) = "create";
+  }
+
+  // Deletes a user-managed service account key. Requires
+  // `iam.cbws.xyz/ServiceAccountKey/delete` on the key. System-managed keys
+  // cannot be deleted.
+  rpc DeleteServiceAccountKey(DeleteServiceAccountKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/{name=projects/*/serviceAccounts/*/keys/*}"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
+  }
+
+  // Gets the IAM policy of a service account. Requires
+  // `iam.cbws.xyz/ServiceAccount/getIAMPolicy` on the service account.
+  //
+  // The policy says who has access to the service account as a resource,
+  // such as who may get tokens for it. It does not say what the service
+  // account itself has access to. That is in the policies of the resources
+  // it is granted on.
+  //
+  // The `resource` is the service account's resource name,
+  // `projects/{project}/serviceAccounts/{email}`.
+  rpc GetPolicy(cbws.iam.policy.v1alpha1.GetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {post: "/v1alpha1/{resource}:getPolicy"};
+    option (google.api.method_signature) = "resource";
+  }
+
+  // Replaces the IAM policy of a service account. Requires
+  // `iam.cbws.xyz/ServiceAccount/setIAMPolicy` on the service account.
+  //
+  // Use it to grant access to the service account as a resource, such as
+  // the right to get tokens for it. To grant the service account access to
+  // another resource, such as a project, set the policy of that resource.
+  //
+  // The `resource` is the service account's resource name,
+  // `projects/{project}/serviceAccounts/{email}`.
+  rpc SetPolicy(cbws.iam.policy.v1alpha1.SetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource}:setPolicy"
+      body: "*"
+    };
+    option (google.api.method_signature) = "resource,policy";
+  }
+}
+
+// The service account list request.
+message ListServiceAccountsRequest {
+  // Required. The project to list the service accounts of, such as
+  // `projects/my-project`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+}
+
+// The service account list response.
+message ListServiceAccountsResponse {
+  // The service accounts of the project, in no particular order.
+  repeated ServiceAccount accounts = 1;
+}
+
+// The service account get request.
+message GetServiceAccountRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+}
+
+// The service account create request.
+message CreateServiceAccountRequest {
+  // Required. The project to create the service account in, such as
+  // `projects/my-project`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Required. The account ID, which becomes the first part of the service
+  // account's email address, `{account_id}@{project}.iam-sa.cbws.xyz`. It
+  // must be unique within the project, be 6 to 30 characters long, and
+  // match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])`.
+  string account_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The properties of the new service account. Only
+  // `display_name` is read.
+  ServiceAccount service_account = 3;
+}
+
+// The service account delete request.
+message DeleteServiceAccountRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+}
+
+// The service account keys list request.
+message ListServiceAccountKeysRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+
+  // Optional. The key types to list. Empty lists keys of every type.
+  repeated ServiceAccountKeyType key_types = 2;
+}
+
+// The service account keys list response.
+message ListServiceAccountKeysResponse {
+  // The keys of the service account, newest first.
+  repeated ServiceAccountKey keys = 1;
+}
+
+// The service account key get request.
+message GetServiceAccountKeyRequest {
+  // Required. The resource name of the key, in the form
+  // `projects/{project}/serviceAccounts/{email}/keys/{key}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccountKey"}
+  ];
+}
+
+// The service account key create request.
+message CreateServiceAccountKeyRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+
+  // Optional. The format of the returned private key. Only the credentials
+  // file format is supported, which is also the default.
+  ServiceAccountPrivateKeyType private_key_type = 2;
+
+  // Optional. The algorithm and size of the key. The default is a 2048-bit
+  // RSA key.
+  ServiceAccountKeyAlgorithm key_algorithm = 3;
+}
+
+// The service account key delete request.
+message DeleteServiceAccountKeyRequest {
+  // Required. The resource name of the key, in the form
+  // `projects/{project}/serviceAccounts/{email}/keys/{key}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccountKey"}
+  ];
+}
+
+// The access token request.
+message GenerateAccessTokenRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+
+  // Required. The OAuth 2.0 scopes to put in the access token.
+  repeated string scope = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The lifetime of the token. The only accepted value is one
+  // hour, which is also the default.
+  google.protobuf.Duration lifetime = 7;
+}
+
+// The access token response.
+message GenerateAccessTokenResponse {
+  // The OAuth 2.0 access token.
+  string access_token = 1;
+
+  // When the token expires.
+  google.protobuf.Timestamp expire_time = 3;
+}

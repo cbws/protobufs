@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package cbws.projects.v1alpha1;
+
+import "google/api/resource.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/projects/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.projects.v1alpha1";
+option php_metadata_namespace = "Cbws\\Projects\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\Projects\\GRPC\\V1alpha1";
+
+// A project: the container that holds your CBWS resources, the services
+// enabled for them, and the IAM policy that controls access to them. A
+// project belongs to an organization.
+message Project {
+  option (google.api.resource) = {
+    type: "projects.cbws.xyz/Project"
+    pattern: ["projects/{project}"]
+  };
+
+  // The resource name of the project, such as `projects/my-project`.
+  string name = 1;
+
+  // Optional. A human-readable name for the project, at most 255
+  // characters.
+  string display_name = 2;
+
+  // The organization the project belongs to, in the form
+  // `organizations/{organization}`, where `{organization}` is the
+  // organization's UUID.
+  string organization = 3;
+
+  // The unique and stable ID of the project, a UUID.
+  string unique_id = 4;
+}

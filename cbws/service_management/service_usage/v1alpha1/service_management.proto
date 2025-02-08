@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package cbws.service_management.service_usage.v1alpha1;
+
+import "cbws/iam/options/v1alpha1/options.proto";
+import "cbws/service_management/service_usage/v1alpha1/service.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/service-usage/v1alpha1";
+option php_metadata_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1";
+
+// Lists, enables and disables the CBWS services of a project.
+//
+// A service must be enabled in a project before its API can be used for the
+// project's resources.
+service ServiceUsageService {
+  option (google.api.default_host) = "serviceusage.cbws.xyz";
+  option (cbws.iam.options.v1alpha1.service) = {service: "serviceusage.cbws.xyz"};
+
+  // Lists the services of a project. Requires
+  // `serviceusage.cbws.xyz/Service/list` on the project.
+  //
+  // The list holds every service that is enabled in the project, and every
+  // service the caller has `servicemanagement.cbws.xyz/Service/bind` on,
+  // with its state. So the list can differ between callers.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/services"};
+    option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Service";
+    option (cbws.iam.options.v1alpha1.action) = "list";
+  }
+
+  // Enables a service in a project, together with the services it depends
+  // on. Requires `serviceusage.cbws.xyz/Service/enable` on the project, and
+  // `servicemanagement.cbws.xyz/Service/bind` on the service and on each of
+  // its dependencies. A service that does not exist, or that the caller
+  // lacks `bind` on, fails with NOT_FOUND.
+  //
+  // Enabling a service that is already enabled succeeds and changes
+  // nothing. If enabling a dependency fails, the services this call enabled
+  // are disabled again.
+  //
+  // The returned operation is already done.
+  rpc EnableService(EnableServiceRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{name=projects/*/services/*}:enable"
+      body: "*"
+    };
+    option (google.api.method_signature) = "service_name,consumer_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceResponse"
+      metadata_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceMetadata"
+    };
+  }
+
+  // Disables a service in a project, so that it can no longer be used
+  // there. Requires `serviceusage.cbws.xyz/Service/disable` on the project,
+  // and `servicemanagement.cbws.xyz/Service/bind` on the service.
+  //
+  // Disabling a service that is not enabled succeeds and changes nothing.
+  // See
+  // [disable_dependent_services][cbws.service_management.service_usage.v1alpha1.DisableServiceRequest.disable_dependent_services]
+  // for services that depend on it.
+  //
+  // The returned operation is already done.
+  rpc DisableService(DisableServiceRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{name=projects/*/services/*}:disable"
+      body: "*"
+    };
+    option (google.api.method_signature) = "service_name,consumer_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceResponse"
+      metadata_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceMetadata"
+    };
+  }
+}
+
+// The service list request.
+message ListServicesRequest {
+  // Required. The project to list the services of, such as
+  // `projects/my-project`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+}
+
+// The service list response.
+message ListServicesResponse {
+  // The services, in no particular order. All of them are returned in one
+  // response.
+  repeated Service services = 1;
+}
+
+// The service enable request.
+message EnableServiceRequest {
+  // Required. The resource name of the service in the project, in the form
+  // `projects/{project}/services/{service}`, such as
+  // `projects/my-project/services/logging.cbws.xyz`.
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The metadata of a service enable operation. It has no fields.
+message EnableServiceMetadata {}
+
+// The response of a service enable operation. It has no fields.
+message EnableServiceResponse {}
+
+// The service disable request.
+message DisableServiceRequest {
+  // Required. The resource name of the service in the project, in the form
+  // `projects/{project}/services/{service}`, such as
+  // `projects/my-project/services/logging.cbws.xyz`.
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The metadata of a service disable operation. It has no fields.
+message DisableServiceMetadata {}
+
+// The response of a service disable operation. It has no fields.
+message DisableServiceResponse {}

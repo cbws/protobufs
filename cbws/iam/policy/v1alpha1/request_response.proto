@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package cbws.iam.policy.v1alpha1;
+
+import "cbws/iam/policy/v1alpha1/policy.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option go_package = "github.com/cbws/go-cbws-grpc/cbws/iam/policy/v1alpha1";
+option java_multiple_files = true;
+option java_package = "xyz.cbws.iam.policy.v1alpha1";
+option php_metadata_namespace = "Cbws\\IAM\\Policy\\GRPC\\V1alpha1\\Metadata";
+option php_namespace = "Cbws\\IAM\\Policy\\GRPC\\V1alpha1";
+
+// The request to replace the IAM policy of a resource.
+message SetPolicyRequest {
+  // Required. The resource name of the resource to set the policy of. Which
+  // resources an API accepts is described on its SetPolicy method.
+  string resource = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "*"}
+  ];
+
+  // Required. The complete new policy. It replaces the stored policy as a
+  // whole, so get the policy first and send it back with your change and
+  // its `etag`.
+  Policy policy = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The request to get the IAM policy of a resource.
+message GetPolicyRequest {
+  // Required. The resource name of the resource to get the policy of. Which
+  // resources an API accepts is described on its GetPolicy method.
+  string resource = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "*"}
+  ];
+}
+
+// The request to test which permissions the caller has on a resource.
+message TestPermissionsRequest {
+  // Required. The resource name of the resource to test the permissions on.
+  // Which resources an API accepts is described on its TestPermissions
+  // method.
+  string resource = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "*"}
+  ];
+
+  // Required. The permissions to test, written as
+  // `{service}/{resource_type}/{action}`, such as
+  // `projects.cbws.xyz/Project/get`. An unknown permission fails with
+  // FAILED_PRECONDITION.
+  repeated string permissions = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The permissions the caller has.
+message TestPermissionsResponse {
+  // The subset of the requested permissions that the caller has on the
+  // resource.
+  repeated string permissions = 1;
+}
