@@ -8,8 +8,8 @@ import "google/api/resource.proto";
 // A size of machine, offered in one or more zones.
 message MachineType {
   option (google.api.resource) = {
-    type: "compute.cbws.xyz/MachineType"
-    pattern: ["projects/{project}/zones/{zone}/machinesType/{name}"]
+    type: "compute.cbws.cloud/MachineType"
+    pattern: ["zones/{zone}/machinesType/{name}"]
   };
 
   // The resource name of the machine type, such as

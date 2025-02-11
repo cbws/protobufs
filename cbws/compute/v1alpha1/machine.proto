@@ -8,7 +8,7 @@ import "google/api/resource.proto";
 // A virtual machine.
 message Machine {
   option (google.api.resource) = {
-    type: "compute.cbws.xyz/Machine"
+    type: "compute.cbws.cloud/Machine"
     pattern: ["projects/{project}/machines/{name}"]
   };
 
