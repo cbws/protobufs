@@ -167,6 +167,9 @@ message CreateMachineResponse {}
 message CreateMachineMetadata {
   // The state of the machine as the operation last saw it.
   Machine.State state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The machine being created.
+  Machine machine = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // The request to stop a machine.
