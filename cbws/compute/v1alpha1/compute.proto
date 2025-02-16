@@ -27,6 +27,13 @@ service ComputeService {
     option (google.api.method_signature) = "name";
   }
 
+  // Returns a URL that opens the console of a running machine in a browser.
+  // A stopped machine has no console.
+  rpc RequestMachineConsole(RequestMachineConsoleRequest) returns (RequestMachineConsoleResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
   // Creates a machine and starts it.
   rpc CreateMachine(CreateMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
@@ -138,6 +145,29 @@ message GetMachineRequest {
   // response: `image`, `type` and `status`, which fills in `state`. Other
   // fields are always returned. Without a mask, all three are read.
   google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The request to open the console of a machine.
+message RequestMachineConsoleRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The console of a machine.
+message RequestMachineConsoleResponse {
+  // The protocol of the console, such as `vnc`.
+  string protocol = 1;
+
+  // The kind of console client the URL opens, such as `novnc`.
+  string type = 2;
+
+  // The URL that opens the console in a browser. Treat it as a secret: it
+  // gives access to the console of the machine.
+  string url = 3;
 }
 
 // The request to create a machine.
