@@ -84,6 +84,19 @@ service ComputeService {
     };
   }
 
+  // Replaces the operating system on a machine with a new image. The data on
+  // the machine's disk is lost.
+  rpc ReinstallMachine(ReinstallMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/machines/*}:reinstall"
+      body: "machine"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "ReinstallMachineResponse"
+      metadata_type: "cbws.compute.v1alpha1.ReinstallMachineMetadata"
+    };
+  }
+
   // Deletes a machine and its disk.
   rpc DeleteMachine(DeleteMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {delete: "/v1/{name=projects/*/machines/*}"};
@@ -249,6 +262,22 @@ message ResetMachineResponse {}
 
 // The metadata of a reset machine operation.
 message ResetMachineMetadata {}
+
+// The request to reinstall a machine.
+message ReinstallMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+}
+
+// The result of a reinstall machine operation.
+message ReinstallMachineResponse {}
+
+// The metadata of a reinstall machine operation.
+message ReinstallMachineMetadata {}
 
 // The request to delete a machine.
 message DeleteMachineRequest {
