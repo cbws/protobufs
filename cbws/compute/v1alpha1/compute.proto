@@ -97,6 +97,19 @@ service ComputeService {
     };
   }
 
+  // Changes a machine to another machine type in the same zone. The machine
+  // is turned off and on again.
+  rpc ResizeMachine(ResizeMachineRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/machines/*}:resize"
+      body: "machine"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "ResizeMachineResponse"
+      metadata_type: "cbws.compute.v1alpha1.ResizeMachineMetadata"
+    };
+  }
+
   // Deletes a machine and its disk.
   rpc DeleteMachine(DeleteMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {delete: "/v1/{name=projects/*/machines/*}"};
@@ -278,6 +291,28 @@ message ReinstallMachineResponse {}
 
 // The metadata of a reinstall machine operation.
 message ReinstallMachineMetadata {}
+
+// The request to resize a machine.
+message ResizeMachineRequest {
+  // Required. The resource name of the machine, such as
+  // `projects/my-project-123/machines/web-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // Required. The machine type to change to, such as
+  // `zones/nl-ein-1/types/g4.2`, or `machineTypes/g4.2` for that type in the
+  // machine's current zone. The type must be offered in the zone the machine
+  // runs in. A resize to the machine's current type finishes without change.
+  string type = 2 [(google.api.field_behavior) = INPUT_ONLY];
+}
+
+// The result of a resize machine operation.
+message ResizeMachineResponse {}
+
+// The metadata of a resize machine operation.
+message ResizeMachineMetadata {}
 
 // The request to delete a machine.
 message DeleteMachineRequest {
