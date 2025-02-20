@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// An operating system image that machines are installed from.
+message Image {
+  option (google.api.resource) = {
+    type: "compute.cbws.cloud/Image"
+    pattern: ["projects/{project}/images/{name}"]
+  };
+
+  // The resource name of the image, such as
+  // `projects/my-project-123/images/ubuntu-2404-lts-20260901`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The project that holds the image, such as `projects/my-project-123`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The family the image belongs to, such as
+  // `projects/my-project-123/families/ubuntu-2404-lts`. Empty for an image in
+  // no family.
+  string family = 3 [(google.api.field_behavior) = IMMUTABLE];
+}

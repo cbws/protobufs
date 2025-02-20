@@ -3,6 +3,7 @@ syntax = "proto3";
 package cbws.compute.v1alpha1;
 
 import "cbws/compute/v1alpha1/machine.proto";
+import "cbws/compute/v1alpha1/machine_type.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -118,6 +119,18 @@ service ComputeService {
       response_type: "google.protobuf.Empty"
       metadata_type: "cbws.compute.v1alpha1.DeleteMachineMetadata"
     };
+  }
+
+  // Lists the machine types offered in a zone, or in every zone.
+  rpc ListMachineTypes(ListMachineTypesRequest) returns (ListMachineTypesResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=zones/*}/types"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Lists the images in a project.
+  rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/images"};
+    option (google.api.method_signature) = "parent";
   }
 }
 
@@ -326,3 +339,73 @@ message DeleteMachineRequest {
 
 // The metadata of a delete machine operation.
 message DeleteMachineMetadata {}
+
+// The request to list machine types.
+message ListMachineTypesRequest {
+  // Required. The zone to list the machine types of, such as `zones/nl-ein-1`.
+  // Use `zones/-` to list the machine types of every zone.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Zone"}
+  ];
+
+  // Optional. The maximum number of machine types to return. The service may
+  // return fewer. Get further machine types by passing
+  // [ListMachineTypesResponse.next_page_token][cbws.compute.v1alpha1.ListMachineTypesResponse.next_page_token]
+  // in a subsequent request.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The page token returned in an earlier
+  // [ListMachineTypesResponse.next_page_token][cbws.compute.v1alpha1.ListMachineTypesResponse.next_page_token].
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: only `machine_types.stock_status`. Other fields are always
+  // returned. Without a mask, `stock_status` is read.
+  google.protobuf.FieldMask read_mask = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The response to a request to list machine types.
+message ListMachineTypesResponse {
+  // The machine types in the zone.
+  repeated MachineType machine_types = 1;
+
+  // To retrieve the next page of results, set
+  // [ListMachineTypesRequest.page_token][cbws.compute.v1alpha1.ListMachineTypesRequest.page_token]
+  // to this value. Empty on the last page.
+  string next_page_token = 2;
+}
+
+// The request to list images.
+message ListImagesRequest {
+  // Required. The project to list the images of, such as
+  // `projects/my-project-123`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Optional. The maximum number of images to return. The service may return
+  // fewer. Get further images by passing
+  // [ListImagesResponse.next_page_token][cbws.compute.v1alpha1.ListImagesResponse.next_page_token]
+  // in a subsequent request.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The page token returned in an earlier
+  // [ListImagesResponse.next_page_token][cbws.compute.v1alpha1.ListImagesResponse.next_page_token].
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. Ignored: every image field is always returned.
+  google.protobuf.FieldMask read_mask = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The response to a request to list images.
+message ListImagesResponse {
+  // The list of matching machines.
+  repeated MachineType machine_types = 1;
+
+  // To retrieve the next page of results, set
+  // [ListImagesRequest.page_token][cbws.compute.v1alpha1.ListImagesRequest.page_token]
+  // to this value. Empty on the last page.
+  string next_page_token = 2;
+}
