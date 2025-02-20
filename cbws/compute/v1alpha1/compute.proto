@@ -128,10 +128,22 @@ service ComputeService {
     option (google.api.method_signature) = "parent";
   }
 
+  // Gets a machine type.
+  rpc GetMachineType(GetMachineTypeRequest) returns (MachineType) {
+    option (google.api.http) = {get: "/v1alpha1/{name=zones/*/types/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
   // Lists the images in a project.
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/images"};
     option (google.api.method_signature) = "parent";
+  }
+
+  // Gets an image.
+  rpc GetImage(GetImageRequest) returns (Image) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/images/*}"};
+    option (google.api.method_signature) = "name";
   }
 }
 
@@ -377,6 +389,22 @@ message ListMachineTypesResponse {
   string next_page_token = 2;
 }
 
+// The request to get a machine type.
+message GetMachineTypeRequest {
+  // Required. The resource name of the machine type, such as
+  // `zones/nl-ein-1/types/g4.2`. `machineTypes/g4.2` names the type across
+  // every zone that offers it.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/MachineType"}
+  ];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: only `stock_status`. Other fields are always returned. Without
+  // a mask, `stock_status` is read.
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
 // The request to list images.
 message ListImagesRequest {
   // Required. The project to list the images of, such as
@@ -409,4 +437,17 @@ message ListImagesResponse {
   // [ListImagesRequest.page_token][cbws.compute.v1alpha1.ListImagesRequest.page_token]
   // to this value. Empty on the last page.
   string next_page_token = 2;
+}
+
+// The request to get an image.
+message GetImageRequest {
+  // Required. The resource name of the image, such as
+  // `projects/my-project-123/images/my-image`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Image"}
+  ];
+
+  // Optional. Ignored: every image field is always returned.
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
 }
