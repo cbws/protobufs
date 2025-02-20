@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package cbws.compute.v1alpha1;
 
+import "cbws/compute/v1alpha1/image.proto";
 import "cbws/compute/v1alpha1/machine.proto";
 import "cbws/compute/v1alpha1/machine_type.proto";
 import "google/api/annotations.proto";
@@ -401,8 +402,8 @@ message ListImagesRequest {
 
 // The response to a request to list images.
 message ListImagesResponse {
-  // The list of matching machines.
-  repeated MachineType machine_types = 1;
+  // The images in the project.
+  repeated Image images = 1;
 
   // To retrieve the next page of results, set
   // [ListImagesRequest.page_token][cbws.compute.v1alpha1.ListImagesRequest.page_token]
