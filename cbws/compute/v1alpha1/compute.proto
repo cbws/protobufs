@@ -310,6 +310,12 @@ message ReinstallMachineRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
   ];
+
+  // Required. The image to install: an image family, such as
+  // `projects/my-project-123/families/ubuntu-2404-lts`, which installs the
+  // family's current image for the machine's type, or a single image, such as
+  // `projects/my-project-123/images/ubuntu-2404-lts-20260901`.
+  string image = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The result of a reinstall machine operation.
