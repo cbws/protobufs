@@ -32,14 +32,14 @@ service ComputeService {
   // Returns a URL that opens the console of a running machine in a browser.
   // A stopped machine has no console.
   rpc RequestMachineConsole(RequestMachineConsoleRequest) returns (RequestMachineConsoleResponse) {
-    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}"};
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}:request-console"};
     option (google.api.method_signature) = "name";
   }
 
   // Creates a machine and starts it.
   rpc CreateMachine(CreateMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*}/machines"
+      post: "/v1alpha1/{parent=projects/*}/machines"
       body: "machine"
     };
     option (google.api.method_signature) = "parent,machine,machine_id";
@@ -51,10 +51,7 @@ service ComputeService {
 
   // Stops a machine. The machine keeps its disk and can be started again.
   rpc StopMachine(StopMachineRequest) returns (google.longrunning.Operation) {
-    option (google.api.http) = {
-      post: "/v1/{name=projects/*/machines/*}:stop"
-      body: "machine"
-    };
+    option (google.api.http) = {post: "/v1alpha1/{name=projects/*/machines/*}:stop"};
     option (google.longrunning.operation_info) = {
       response_type: "StopMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.StopMachineMetadata"
@@ -63,10 +60,7 @@ service ComputeService {
 
   // Starts a stopped machine.
   rpc StartMachine(StartMachineRequest) returns (google.longrunning.Operation) {
-    option (google.api.http) = {
-      post: "/v1/{name=projects/*/machines/*}:start"
-      body: "machine"
-    };
+    option (google.api.http) = {post: "/v1alpha1/{name=projects/*/machines/*}:start"};
     option (google.longrunning.operation_info) = {
       response_type: "StartMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.StartMachineMetadata"
@@ -76,10 +70,7 @@ service ComputeService {
   // Power-cycles a machine, like pressing its reset button. The operating
   // system is not shut down first.
   rpc ResetMachine(ResetMachineRequest) returns (google.longrunning.Operation) {
-    option (google.api.http) = {
-      post: "/v1/{name=projects/*/machines/*}:reset"
-      body: "machine"
-    };
+    option (google.api.http) = {post: "/v1alpha1/{name=projects/*/machines/*}:reset"};
     option (google.longrunning.operation_info) = {
       response_type: "ResetMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.ResetMachineMetadata"
@@ -90,8 +81,8 @@ service ComputeService {
   // the machine's disk is lost.
   rpc ReinstallMachine(ReinstallMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{name=projects/*/machines/*}:reinstall"
-      body: "machine"
+      post: "/v1alpha1/{name=projects/*/machines/*}:reinstall"
+      body: "*"
     };
     option (google.longrunning.operation_info) = {
       response_type: "ReinstallMachineResponse"
@@ -103,8 +94,8 @@ service ComputeService {
   // is turned off and on again.
   rpc ResizeMachine(ResizeMachineRequest) returns (google.longrunning.Operation) {
     option (google.api.http) = {
-      post: "/v1/{name=projects/*/machines/*}:resize"
-      body: "machine"
+      post: "/v1alpha1/{name=projects/*/machines/*}:resize"
+      body: "*"
     };
     option (google.longrunning.operation_info) = {
       response_type: "ResizeMachineResponse"
@@ -114,7 +105,7 @@ service ComputeService {
 
   // Deletes a machine and its disk.
   rpc DeleteMachine(DeleteMachineRequest) returns (google.longrunning.Operation) {
-    option (google.api.http) = {delete: "/v1/{name=projects/*/machines/*}"};
+    option (google.api.http) = {delete: "/v1alpha1/{name=projects/*/machines/*}"};
     option (google.api.method_signature) = "name";
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"

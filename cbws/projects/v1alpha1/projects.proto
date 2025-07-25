@@ -62,7 +62,7 @@ service ProjectsService {
   // name can be changed.
   rpc UpdateProject(UpdateProjectRequest) returns (Project) {
     option (google.api.http) = {
-      post: "/v1alpha1/projects"
+      post: "/v1alpha1/{project.name=projects/*}"
       body: "*"
     };
     option (cbws.iam.options.v1alpha1.resource_type) = "Project";

@@ -28,4 +28,24 @@ message MachineType {
   // The size of the machine's local disk, in GB. The disk is not a volume:
   // it exists only as long as the machine does.
   int32 ephemeral_disk_gb = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // How many machines of a type can still be created.
+  enum StockStatus {
+    // The stock was not read or is not known.
+    STOCK_STATUS_UNSPECIFIED = 0;
+
+    // Machines of this type are available.
+    STOCK_STATUS_IN_STOCK = 1;
+
+    // Few machines of this type are available.
+    STOCK_STATUS_LOW_STOCK = 2;
+
+    // No machines of this type are available, so a create or a resize to
+    // this type can fail.
+    STOCK_STATUS_OUT_OF_STOCK = 3;
+  }
+
+  // How many machines of this type can still be created. Unset when the
+  // request's read mask leaves out `stock_status`.
+  StockStatus stock_status = 7;
 }

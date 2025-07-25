@@ -118,7 +118,7 @@ service IAMService {
   // account.
   rpc CreateServiceAccountKey(CreateServiceAccountKeyRequest) returns (ServiceAccountKey) {
     option (google.api.http) = {
-      post: "/v1/{name=projects/*/serviceAccounts/*}/keys"
+      post: "/v1/{parent=projects/*/serviceAccounts/*}/keys"
       body: "*"
     };
     option (google.api.method_signature) = "name,private_key_type,key_algorithm";
