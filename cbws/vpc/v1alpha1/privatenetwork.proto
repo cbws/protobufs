@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package cbws.vpc.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A private network: one network segment of a VPC, in one zone. Machines
+// attach to a private network, and its subnets give them their addresses.
+message PrivateNetwork {
+  option (google.api.resource) = {
+    type: "vpc.cbws.cloud/PrivateNetwork"
+    pattern: ["projects/{project}/vpcs/{vpc}/privateNetworks/{name}"]
+  };
+
+  // The resource name of the private network, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The VPC the private network belongs to, such as
+  // `projects/my-project/vpcs/default`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+}
+
+// The private network list request.
+message ListPrivateNetworksRequest {
+  // Required. The VPC to list the private networks of, such as
+  // `projects/my-project/vpcs/default`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/Vpc"}
+  ];
+
+  // Optional. The maximum number of private networks to return, at most 25.
+  // Zero or a larger value means the default of 10.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The
+  // [next_page_token][cbws.vpc.v1alpha1.ListPrivateNetworksResponse.next_page_token]
+  // of a previous response, to get the next page.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The private network list response.
+message ListPrivateNetworksResponse {
+  // The private networks of the VPC.
+  repeated PrivateNetwork private_networks = 1;
+
+  // The token to get the next page with, by setting it as
+  // [page_token][cbws.vpc.v1alpha1.ListPrivateNetworksRequest.page_token].
+  // Empty on the last page.
+  string next_page_token = 2;
+}
+
+// The private network get request.
+message GetPrivateNetworkRequest {
+  // Required. The resource name of the private network, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/PrivateNetwork"}
+  ];
+}
+
+// The private network delete request.
+message DeletePrivateNetworkRequest {
+  // Required. The resource name of the private network, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/PrivateNetwork"}
+  ];
+}
+
+// The metadata of a private network delete operation. It has no fields.
+message DeletePrivateNetworkMetadata {}

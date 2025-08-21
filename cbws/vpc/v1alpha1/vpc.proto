@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package cbws.vpc.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A VPC: an isolated network for a project. It spans every zone, and holds
+// the private networks that machines attach to. Subnet prefixes are unique
+// within a VPC.
+message Vpc {
+  option (google.api.resource) = {
+    type: "vpc.cbws.cloud/Vpc"
+    pattern: ["projects/{project}/vpcs/{name}"]
+  };
+
+  // The resource name of the VPC, such as
+  // `projects/my-project/vpcs/default`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The project the VPC belongs to, such as `projects/my-project`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+}
+
+// The VPC list request.
+message ListVpcsRequest {
+  // Required. The project to list the VPCs of, such as
+  // `projects/my-project`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Optional. The maximum number of VPCs to return, at most 25. Zero or a
+  // larger value means the default of 10.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The
+  // [next_page_token][cbws.vpc.v1alpha1.ListVpcsResponse.next_page_token]
+  // of a previous response, to get the next page.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The VPC list response.
+message ListVpcsResponse {
+  // The VPCs of the project.
+  repeated Vpc vpcs = 1;
+
+  // The token to get the next page with, by setting it as
+  // [page_token][cbws.vpc.v1alpha1.ListVpcsRequest.page_token]. Empty on the
+  // last page.
+  string next_page_token = 2;
+}
+
+// The VPC get request.
+message GetVpcRequest {
+  // Required. The resource name of the VPC, such as
+  // `projects/my-project/vpcs/default`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/Vpc"}
+  ];
+}
+
+// The VPC delete request.
+message DeleteVpcRequest {
+  // Required. The resource name of the VPC, such as
+  // `projects/my-project/vpcs/default`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/Vpc"}
+  ];
+}
+
+// The metadata of a VPC delete operation. It has no fields.
+message DeleteVpcMetadata {}

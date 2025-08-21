@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package cbws.vpc.v1alpha1;
+
+import "cbws/vpc/v1alpha1/privatenetwork.proto";
+import "cbws/vpc/v1alpha1/vpc.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/longrunning/operations.proto";
+
+// Manages VPCs, the private networks and subnets inside them, and ports on
+// those networks.
+//
+// Every call that changes something needs an `Idempotency-Key` request
+// header that holds a UUID. Send the same key again to retry a call safely:
+// the retry returns the operation of the first call instead of repeating the
+// change. A call without the header fails with INVALID_ARGUMENT.
+//
+// Those calls return a `google.longrunning.Operation`. The work is done
+// before the call returns, so the operation is always already done. The
+// operation can be read again from the `google.longrunning.Operations`
+// service on the same host.
+service VpcService {
+  option (google.api.default_host) = "vpc.cbws.cloud";
+
+  // Lists the VPCs of a project. Requires `vpc.cbws.cloud/Vpc/list` on the
+  // project.
+  rpc ListVpcs(ListVpcsRequest) returns (ListVpcsResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/vpcs"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets a VPC. Requires `vpc.cbws.cloud/Vpc/get` on the VPC.
+  rpc GetVpc(GetVpcRequest) returns (Vpc) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Deletes a VPC. Requires `vpc.cbws.cloud/Vpc/delete` on the VPC.
+  //
+  // A VPC that still has private networks cannot be deleted: the call fails
+  // with FAILED_PRECONDITION and names them. Delete them first.
+  rpc DeleteVpc(DeleteVpcRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {delete: "/v1alpha1/{name=projects/*/vpcs/*}"};
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "cbws.vpc.v1alpha1.DeleteVpcMetadata"
+    };
+  }
+
+  // Lists the private networks of a VPC. Requires
+  // `vpc.cbws.cloud/PrivateNetwork/list` on the VPC.
+  rpc ListPrivateNetworks(ListPrivateNetworksRequest) returns (ListPrivateNetworksResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*}/privateNetworks"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets a private network. Requires `vpc.cbws.cloud/PrivateNetwork/get` on
+  // the private network.
+  rpc GetPrivateNetwork(GetPrivateNetworkRequest) returns (PrivateNetwork) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Deletes a private network. Requires
+  // `vpc.cbws.cloud/PrivateNetwork/delete` on the private network.
+  rpc DeletePrivateNetwork(DeletePrivateNetworkRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {delete: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*}"};
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "cbws.vpc.v1alpha1.DeletePrivateNetworkMetadata"
+    };
+  }
+}

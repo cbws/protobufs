@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package cbws.vpc.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A subnet: an IPv4 or IPv6 prefix on a private network, from which machines
+// on that network get their addresses.
+message Subnet {
+  option (google.api.resource) = {
+    type: "vpc.cbws.cloud/Subnet"
+    pattern: ["projects/{project}/privateNetworks/{privateNetwork}/subnets/{subnet}"]
+  };
+
+  // The resource name of the subnet, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1/subnets/subnet-1`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The private network the subnet belongs to, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The prefix of the subnet in CIDR notation, such as `10.0.0.0/24` or
+  // `2001:db8::/64`. Required on create.
+  //
+  // Host bits are cleared, so `10.0.0.5/24` becomes `10.0.0.0/24`. A `/32`
+  // or `/128` prefix is refused. The prefix must not overlap any other
+  // subnet in the same VPC.
+  // buf:lint:ignore FIELD_SAME_TYPE
+  string prefix = 3 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The gateway address of the subnet: always the first address after the
+  // network address, so `10.0.0.0/24` gives `10.0.0.1` and `2001:db8::/64`
+  // gives `2001:db8::1`. It is set by the service.
+  string gateway = 4 [(google.api.field_behavior) = IMMUTABLE];
+}
