@@ -118,6 +118,14 @@ message DisableServiceRequest {
   // `projects/{project}/services/{service}`, such as
   // `projects/my-project/services/logging.cbws.xyz`.
   string name = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Whether to also disable the enabled services that depend on
+  // this one. They are disabled first.
+  //
+  // If false and such services exist, the call fails with
+  // FAILED_PRECONDITION. The error names each dependent service in a
+  // `PreconditionFailure` violation of type `DEPENDENT_SERVICE_ENABLED`.
+  bool disable_dependent_services = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The metadata of a service disable operation. It has no fields.
