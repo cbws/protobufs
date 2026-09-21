@@ -10,7 +10,7 @@ import "google/api/resource.proto";
 message Subnet {
   option (google.api.resource) = {
     type: "vpc.cbws.cloud/Subnet"
-    pattern: ["projects/{project}/privateNetworks/{privateNetwork}/subnets/{subnet}"]
+    pattern: ["projects/{project}/vpcs/{vpc}/privateNetworks/{privateNetwork}/subnets/{subnet}"]
   };
 
   // The resource name of the subnet, such as
