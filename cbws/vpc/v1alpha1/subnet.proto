@@ -4,6 +4,7 @@ package cbws.vpc.v1alpha1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/field_mask.proto";
 
 // A subnet: an IPv4 or IPv6 prefix on a private network, from which machines
 // on that network get their addresses.
@@ -34,4 +35,56 @@ message Subnet {
   // network address, so `10.0.0.0/24` gives `10.0.0.1` and `2001:db8::/64`
   // gives `2001:db8::1`. It is set by the service.
   string gateway = 4 [(google.api.field_behavior) = IMMUTABLE];
+}
+
+// The subnet list request.
+message ListSubnetsRequest {
+  // Required. The private network to list the subnets of, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/PrivateNetwork"}
+  ];
+
+  // Optional. The maximum number of subnets to return, at most 25. Zero or a
+  // larger value means the default of 10.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The
+  // [next_page_token][cbws.vpc.v1alpha1.ListSubnetsResponse.next_page_token]
+  // of a previous response, to get the next page.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The fields to return. Without a mask, every field is returned.
+  //
+  // `prefix` and `gateway` are the slow fields to look up. A mask that names
+  // neither `prefix` nor `gateway` (or `subnets.prefix` or
+  // `subnets.gateway`) leaves both empty, which makes the call faster when
+  // you only need the subnet names.
+  google.protobuf.FieldMask read_mask = 4 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The subnet list response.
+message ListSubnetsResponse {
+  // The subnets of the private network.
+  repeated Subnet subnets = 1;
+
+  // The token to get the next page with, by setting it as
+  // [page_token][cbws.vpc.v1alpha1.ListSubnetsRequest.page_token]. Empty on
+  // the last page.
+  string next_page_token = 2;
+}
+
+// The subnet get request.
+message GetSubnetRequest {
+  // Required. The resource name of the subnet, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1/subnets/subnet-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/Subnet"}
+  ];
+
+  // Optional. The fields to return, as for
+  // [ListSubnetsRequest.read_mask][cbws.vpc.v1alpha1.ListSubnetsRequest.read_mask].
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
 }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package cbws.vpc.v1alpha1;
 
 import "cbws/vpc/v1alpha1/privatenetwork.proto";
+import "cbws/vpc/v1alpha1/subnet.proto";
 import "cbws/vpc/v1alpha1/vpc.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
@@ -72,5 +73,18 @@ service VpcService {
       response_type: "google.protobuf.Empty"
       metadata_type: "cbws.vpc.v1alpha1.DeletePrivateNetworkMetadata"
     };
+  }
+
+  // Lists the subnets of a private network. Requires
+  // `vpc.cbws.cloud/Subnet/list` on the private network.
+  rpc ListSubnets(ListSubnetsRequest) returns (ListSubnetsResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/subnets"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets a subnet. Requires `vpc.cbws.cloud/Subnet/get` on the subnet.
+  rpc GetSubnet(GetSubnetRequest) returns (Subnet) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*/subnets/*}"};
+    option (google.api.method_signature) = "name";
   }
 }
