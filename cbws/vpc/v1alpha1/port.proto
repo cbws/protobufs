@@ -35,10 +35,7 @@ message Port {
   //
   // Empty means that the port is reserved but not attached to anything. It
   // still holds its addresses and its MAC address.
-  string owner = 3 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.field_behavior) = IMMUTABLE
-  ];
+  string owner = 3 [(google.api.field_behavior) = OPTIONAL];
 
   // The IP families the port holds an address of, at most one entry per
   // family.
