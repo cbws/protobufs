@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package cbws.vpc.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// A port: a MAC address and at most one address of each IP family, reserved
+// on a private network for a project.
+//
+// A port is a reservation. It keeps its addresses and its MAC address for as
+// long as it exists, whatever it is attached to, so an address can outlive
+// the machine that uses it. CBWS creates and attaches the ports of your
+// machines.
+//
+// A port belongs to the project that uses the addresses, which can differ
+// from the project that owns the private network. A machine on a network
+// shared by another project holds its port in its own project.
+message Port {
+  option (google.api.resource) = {
+    type: "vpc.cbws.cloud/Port"
+    pattern: ["projects/{project}/vpcs/{vpc}/privateNetworks/{privateNetwork}/ports/{port}"]
+  };
+
+  // The resource name of the port, such as
+  // `projects/my-project/ports/port-1`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The project that holds the port, such as `projects/my-project`. It is
+  // not necessarily the project that owns the private network.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The full resource name of what holds the port, such as
+  // `//compute.cbws.cloud/projects/my-project/machines/vm-1`.
+  //
+  // Empty means that the port is reserved but not attached to anything. It
+  // still holds its addresses and its MAC address.
+  string owner = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = IMMUTABLE
+  ];
+
+  // The IP families the port holds an address of, at most one entry per
+  // family.
+  repeated IpFamily ip_families = 4 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.field_behavior) = IMMUTABLE
+  ];
+
+  // The IPv4 address of the port, from one of the private network's IPv4
+  // subnets. Empty when the port has no IPv4 address.
+  //
+  // It does not change for the life of the port, and is released when the
+  // port is deleted. To keep an address, keep the port: a released address
+  // cannot be asked for again.
+  string ipv4_address = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The IPv6 address of the port, on the same terms as
+  // [ipv4_address][cbws.vpc.v1alpha1.Port.ipv4_address]. Empty when the port
+  // has no IPv6 address.
+  string ipv6_address = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The MAC address of the port, in lowercase with colons, such as
+  // `02:00:5e:10:00:01`. It does not change for the life of the port.
+  string mac_address = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The state of the port's reservation. A port is `STATE_ACTIVE` as soon
+  // as it exists. It says nothing about whether the port is attached.
+  State state = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // An IP family.
+  enum IpFamily {
+    // Not specified. Refused in
+    // [ip_families][cbws.vpc.v1alpha1.Port.ip_families].
+    IP_FAMILY_UNSPECIFIED = 0;
+
+    // IPv4.
+    IP_FAMILY_IPV4 = 1;
+
+    // IPv6.
+    IP_FAMILY_IPV6 = 2;
+  }
+
+  // The state of a port's reservation.
+  enum State {
+    // Not specified.
+    STATE_UNSPECIFIED = 0;
+
+    // Reserved. The addresses and the MAC address are held for the port
+    // for as long as it exists.
+    STATE_ACTIVE = 2;
+  }
+}
+
+// The port list request.
+message ListPortsRequest {
+  // Required. What to list the ports of. One of:
+  //
+  // * `projects/{project}`: the ports the project holds, whatever network
+  //   each is on. Requires `vpc.cbws.cloud/Port/list` on the project.
+  // * `projects/{project}/vpcs/{vpc}/privateNetworks/{private_network}`: the
+  //   ports on that private network, including ports of other projects.
+  //   Requires `vpc.cbws.cloud/Port/list` on the private network.
+  // * `projects/{project}/vpcs/{vpc}/privateNetworks/-`: the ports on every
+  //   private network of that VPC. Requires `vpc.cbws.cloud/Port/list` on
+  //   the VPC.
+  //
+  // The first form does not list ports of other projects on the project's
+  // own networks. Use one of the network forms for those.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/PrivateNetwork"}
+  ];
+
+  // Optional. The maximum number of ports to return, at most 25. Zero or a
+  // larger value means the default of 10.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The
+  // [next_page_token][cbws.vpc.v1alpha1.ListPortsResponse.next_page_token]
+  // of a previous response, to get the next page.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The port list response.
+message ListPortsResponse {
+  // The ports.
+  repeated Port ports = 1;
+
+  // The token to get the next page with, by setting it as
+  // [page_token][cbws.vpc.v1alpha1.ListPortsRequest.page_token]. Empty on the
+  // last page.
+  string next_page_token = 2;
+}
+
+// The port get request.
+message GetPortRequest {
+  // Required. The resource name of the port, such as
+  // `projects/my-project/ports/port-1`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "vpc.cbws.cloud/Port"}
+  ];
+}

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package cbws.vpc.v1alpha1;
 
+import "cbws/vpc/v1alpha1/port.proto";
 import "cbws/vpc/v1alpha1/privatenetwork.proto";
 import "cbws/vpc/v1alpha1/subnet.proto";
 import "cbws/vpc/v1alpha1/vpc.proto";
@@ -112,5 +113,20 @@ service VpcService {
       response_type: "cbws.vpc.v1alpha1.DeleteSubnetResponse"
       metadata_type: "cbws.vpc.v1alpha1.DeleteSubnetMetadata"
     };
+  }
+
+  // Lists ports, either the ports a project holds or the ports on a private
+  // network. See
+  // [ListPortsRequest.parent][cbws.vpc.v1alpha1.ListPortsRequest.parent].
+  rpc ListPorts(ListPortsRequest) returns (ListPortsResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/ports"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets a port. Requires `vpc.cbws.cloud/Port/get` on the port, or on the
+  // private network it is attached to.
+  rpc GetPort(GetPortRequest) returns (Port) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*/ports/*}"};
+    option (google.api.method_signature) = "name";
   }
 }
