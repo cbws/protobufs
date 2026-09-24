@@ -9,7 +9,7 @@ import "google/api/resource.proto";
 message MachineType {
   option (google.api.resource) = {
     type: "compute.cbws.cloud/MachineType"
-    pattern: ["zones/{zone}/machinesType/{name}"]
+    pattern: ["zones/{zone}/types/{name}"]
   };
 
   // The resource name of the machine type, such as
