@@ -119,14 +119,18 @@ service VpcService {
   // network. See
   // [ListPortsRequest.parent][cbws.vpc.v1alpha1.ListPortsRequest.parent].
   rpc ListPorts(ListPortsRequest) returns (ListPortsResponse) {
-    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/ports"};
+    option (google.api.http) = {
+      get: "/v1alpha1/{parent=projects/*}/ports"
+      additional_bindings: [
+        {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/ports"}]
+    };
     option (google.api.method_signature) = "parent";
   }
 
   // Gets a port. Requires `vpc.cbws.cloud/Port/get` on the port, or on the
   // private network it is attached to.
   rpc GetPort(GetPortRequest) returns (Port) {
-    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*/ports/*}"};
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/ports/*}"};
     option (google.api.method_signature) = "name";
   }
 }
