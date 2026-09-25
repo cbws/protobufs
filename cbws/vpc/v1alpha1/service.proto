@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package cbws.vpc.v1alpha1;
 
+import "cbws/iam/policy/v1alpha1/policy.proto";
+import "cbws/iam/policy/v1alpha1/request_response.proto";
 import "cbws/vpc/v1alpha1/port.proto";
 import "cbws/vpc/v1alpha1/privatenetwork.proto";
 import "cbws/vpc/v1alpha1/subnet.proto";
@@ -132,5 +134,60 @@ service VpcService {
   rpc GetPort(GetPortRequest) returns (Port) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/ports/*}"};
     option (google.api.method_signature) = "name";
+  }
+
+  // Gets the IAM policy of a VPC or a private network. Requires
+  // `vpc.cbws.cloud/Vpc/getIAMPolicy` on the VPC, or
+  // `vpc.cbws.cloud/PrivateNetwork/getIAMPolicy` on the private network.
+  //
+  // The `resource` is the resource name of a VPC, such as
+  // `projects/my-project/vpcs/default`, or of a private network, such as
+  // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`. A binding on
+  // a VPC applies to every private network in it. A binding on a private
+  // network applies to that network only, so a network can be shared with
+  // other projects without sharing the rest of its VPC.
+  rpc GetPolicy(cbws.iam.policy.v1alpha1.GetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource=projects/*/vpcs/*}:getPolicy"
+      additional_bindings: [
+        {post: "/v1alpha1/{resource=projects/*/vpcs/*/privateNetworks/*}:getPolicy"}]
+    };
+    option (google.api.method_signature) = "resource";
+  }
+
+  // Replaces the IAM policy of a VPC or a private network. Requires
+  // `vpc.cbws.cloud/Vpc/setIAMPolicy` on the VPC, or
+  // `vpc.cbws.cloud/PrivateNetwork/setIAMPolicy` on the private network. The
+  // accepted resources are the same as for
+  // [GetPolicy][cbws.vpc.v1alpha1.VpcService.GetPolicy].
+  rpc SetPolicy(cbws.iam.policy.v1alpha1.SetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource=projects/*/vpcs/*}:setPolicy"
+      body: "*"
+      additional_bindings: [
+        {
+          post: "/v1alpha1/{resource=projects/*/vpcs/*/privateNetworks/*}:setPolicy"
+          body: "*"
+        }
+      ]
+    };
+    option (google.api.method_signature) = "resource,policy";
+  }
+
+  // Returns which of the given permissions the caller has on a VPC or a
+  // private network. The accepted resources are the same as for
+  // [GetPolicy][cbws.vpc.v1alpha1.VpcService.GetPolicy].
+  rpc TestPermissions(cbws.iam.policy.v1alpha1.TestPermissionsRequest) returns (cbws.iam.policy.v1alpha1.TestPermissionsResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{resource=projects/*/vpcs/*}:testPermissions"
+      body: "*"
+      additional_bindings: [
+        {
+          post: "/v1alpha1/{resource=projects/*/vpcs/*/privateNetworks/*}:testPermissions"
+          body: "*"
+        }
+      ]
+    };
+    option (google.api.method_signature) = "resource,permissions";
   }
 }
