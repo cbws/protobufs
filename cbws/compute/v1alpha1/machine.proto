@@ -37,6 +37,11 @@ message Machine {
   // The IPv4 address the machine holds. Empty on a machine with no IPv4 address.
   string address = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // The IPv6 address the machine holds, the counterpart of
+  // [address][cbws.compute.v1alpha1.Machine.address]. Empty on a machine with no IPv6
+  // address, which is normal on a network with no IPv6 subnet.
+  string ipv6_address = 17 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // Public keys installed for the image's default user when the machine first boots.
   //
   // Accepted on create and never returned, so a machine read back always reports this
