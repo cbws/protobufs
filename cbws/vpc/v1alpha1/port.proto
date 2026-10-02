@@ -66,6 +66,19 @@ message Port {
   // has no IPv6 address.
   string ipv6_address = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // The subnet [ipv4_address][cbws.vpc.v1alpha1.Port.ipv4_address] is from,
+  // with what is needed to configure the address. Unset when the port has
+  // no IPv4 address.
+  //
+  // It is on the port so that the address can be configured from the port
+  // alone, without access to the private network's subnets.
+  AddressSubnet ipv4_subnet = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The subnet [ipv6_address][cbws.vpc.v1alpha1.Port.ipv6_address] is from,
+  // on the same terms as [ipv4_subnet][cbws.vpc.v1alpha1.Port.ipv4_subnet].
+  // Unset when the port has no IPv6 address.
+  AddressSubnet ipv6_subnet = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // The MAC address of the port, in lowercase with colons, such as
   // `02:00:5e:10:00:01`. It does not change for the life of the port.
   string mac_address = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -85,6 +98,30 @@ message Port {
 
     // IPv6.
     IP_FAMILY_IPV6 = 2;
+  }
+
+  // The subnet one of the port's addresses is from.
+  message AddressSubnet {
+    // The resource name of the subnet, such as
+    // `projects/other-project/vpcs/default/privateNetworks/shared/subnets/subnet-1`.
+    // It gives no access to the subnet itself.
+    string subnet = 1 [
+      (google.api.field_behavior) = OUTPUT_ONLY,
+      (google.api.resource_reference) = {type: "vpc.cbws.cloud/Subnet"}
+    ];
+
+    // The prefix of the subnet in CIDR notation, such as
+    // `198.51.100.0/26`. Configure the address with this prefix length.
+    // Every address in the prefix is on-link.
+    string prefix = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // The gateway of the subnet, such as `198.51.100.1`. Point the
+    // default route for the address's family here.
+    //
+    // Empty when the subnet has no gateway. The address then has only its
+    // on-link prefix. Do not pick a gateway of your own, because any
+    // other address on the network may belong to someone else.
+    string gateway = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
   }
 
   // The state of a port's reservation.
