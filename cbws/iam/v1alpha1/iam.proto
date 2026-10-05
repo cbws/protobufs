@@ -86,6 +86,34 @@ service IAMService {
     option (cbws.iam.options.v1alpha1.action) = "generateAccessToken";
   }
 
+  // Signs a JWT with one of the service account's system-managed keys, so
+  // that it verifies against the account's published key set. Requires
+  // `iam.cbws.xyz/ServiceAccount/signJwt` on the service account.
+  //
+  // The JWT header is `{"alg":"RS256","kid":"<key_id>","typ":"JWT"}`. The
+  // call fails with FAILED_PRECONDITION when the account has no
+  // system-managed key that stays valid for at least another hour.
+  rpc SignJwt(SignJwtRequest) returns (SignJwtResponse) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/serviceAccounts/*}:signJwt"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,delegates,payload";
+  }
+
+  // Signs a blob with one of the service account's system-managed keys.
+  // Requires `iam.cbws.xyz/ServiceAccount/signBlob` on the service account.
+  //
+  // The call fails with FAILED_PRECONDITION when the account has no
+  // system-managed key that stays valid for at least another hour.
+  rpc SignBlob(SignBlobRequest) returns (SignBlobResponse) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/serviceAccounts/*}:signBlob"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,delegates,payload";
+  }
+
   // Lists the keys of a service account, newest first. Requires
   // `iam.cbws.xyz/ServiceAccountKey/list` on the service account.
   //
@@ -306,4 +334,57 @@ message GenerateAccessTokenResponse {
 
   // When the token expires.
   google.protobuf.Timestamp expire_time = 3;
+}
+
+// The JWT signing request.
+message SignJwtRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+
+  // Required. The JWT claims set to sign, as a serialized JSON object.
+  //
+  // `iss` and `sub` are set to the service account's email address; a
+  // payload that sets either to a different value is rejected. `exp`, if
+  // present, must be an integer timestamp that is not in the past and no
+  // more than one hour in the future; if absent, it is set to one hour after
+  // signing. `iat` is set to the time of signing if absent.
+  string payload = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The JWT signing response.
+message SignJwtResponse {
+  // The ID of the key used to sign the JWT. It is also the JWT's `kid`
+  // header, and identifies the key in the service account's published key
+  // set.
+  string key_id = 1;
+
+  // The signed JWT, in compact serialization.
+  string signed_jwt = 2;
+}
+
+// The blob signing request.
+message SignBlobRequest {
+  // Required. The resource name of the service account, in the form
+  // `projects/{project}/serviceAccounts/{email}`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "iam.cbws.xyz/ServiceAccount"}
+  ];
+
+  // Required. The bytes to sign. It must not be empty.
+  bytes payload = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The blob signing response.
+message SignBlobResponse {
+  // The ID of the key used to sign the blob, identifying it in the service
+  // account's published key set.
+  string key_id = 1;
+
+  // The RSASSA-PKCS1-v1_5 signature over the SHA-256 digest of the payload.
+  bytes signed_blob = 4;
 }
