@@ -11,6 +11,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 
 // Manages virtual machines, the machine types they run on and the images they
 // boot from.
@@ -243,6 +244,12 @@ message CreateMachineMetadata {
 
   // The machine being created.
   Machine machine = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // The request to stop a machine.
@@ -259,7 +266,13 @@ message StopMachineRequest {
 message StopMachineResponse {}
 
 // The metadata of a stop machine operation.
-message StopMachineMetadata {}
+message StopMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to start a machine.
 message StartMachineRequest {
@@ -275,7 +288,13 @@ message StartMachineRequest {
 message StartMachineResponse {}
 
 // The metadata of a start machine operation.
-message StartMachineMetadata {}
+message StartMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to reset a machine.
 message ResetMachineRequest {
@@ -291,7 +310,13 @@ message ResetMachineRequest {
 message ResetMachineResponse {}
 
 // The metadata of a reset machine operation.
-message ResetMachineMetadata {}
+message ResetMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to reinstall a machine.
 message ReinstallMachineRequest {
@@ -313,7 +338,13 @@ message ReinstallMachineRequest {
 message ReinstallMachineResponse {}
 
 // The metadata of a reinstall machine operation.
-message ReinstallMachineMetadata {}
+message ReinstallMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to resize a machine.
 message ResizeMachineRequest {
@@ -335,7 +366,13 @@ message ResizeMachineRequest {
 message ResizeMachineResponse {}
 
 // The metadata of a resize machine operation.
-message ResizeMachineMetadata {}
+message ResizeMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to delete a machine.
 message DeleteMachineRequest {
@@ -348,7 +385,13 @@ message DeleteMachineRequest {
 }
 
 // The metadata of a delete machine operation.
-message DeleteMachineMetadata {}
+message DeleteMachineMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
 
 // The request to list machine types.
 message ListMachineTypesRequest {
