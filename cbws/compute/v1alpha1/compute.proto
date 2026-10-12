@@ -137,6 +137,25 @@ service ComputeService {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/images/*}"};
     option (google.api.method_signature) = "name";
   }
+
+  // Lists the image families in a project.
+  rpc ListImageFamilies(ListImageFamiliesRequest) returns (ListImageFamiliesResponse) {
+    option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/families"};
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Gets an image family.
+  rpc GetImageFamily(GetImageFamilyRequest) returns (ImageFamily) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/families/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Returns the image a machine of the given type would boot from the family
+  // right now.
+  rpc GetImageFromFamily(GetImageFromFamilyRequest) returns (Image) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/families/*}:image"};
+    option (google.api.method_signature) = "name,machine_type";
+  }
 }
 
 // The request to list machines.
@@ -490,4 +509,64 @@ message GetImageRequest {
 
   // Optional. Ignored: every image field is always returned.
   google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The request to list image families.
+message ListImageFamiliesRequest {
+  // Required. The project whose image families to list, such as
+  // `projects/my-project-123`.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Optional. The maximum number of families to return. The service may
+  // return fewer. Get further families by passing
+  // [ListImageFamiliesResponse.next_page_token][cbws.compute.v1alpha1.ListImageFamiliesResponse.next_page_token]
+  // in a subsequent request.
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. The page token returned in an earlier
+  // [ListImageFamiliesResponse.next_page_token][cbws.compute.v1alpha1.ListImageFamiliesResponse.next_page_token].
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The response to a request to list image families.
+message ListImageFamiliesResponse {
+  // The image families in the project.
+  repeated ImageFamily image_families = 1;
+
+  // To retrieve the next page of results, set
+  // [ListImageFamiliesRequest.page_token][cbws.compute.v1alpha1.ListImageFamiliesRequest.page_token]
+  // to this value. Empty on the last page.
+  string next_page_token = 2;
+}
+
+// The request to get an image family.
+message GetImageFamilyRequest {
+  // Required. The resource name of the family, such as
+  // `projects/my-project-123/families/ubuntu-2404-lts`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/ImageFamily"}
+  ];
+}
+
+// The request to find the image a family resolves to.
+message GetImageFromFamilyRequest {
+  // Required. The resource name of the family, such as
+  // `projects/my-project-123/families/ubuntu-2404-lts`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/ImageFamily"}
+  ];
+
+  // Required. The machine type the image is for, such as
+  // `zones/nl-ein-1/types/g4.2` or `machineTypes/g4.2`. A family can hold
+  // different images for different machine types, so the machine type
+  // decides which image applies.
+  string machine_type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/MachineType"}
+  ];
 }

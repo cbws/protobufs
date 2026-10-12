@@ -24,3 +24,21 @@ message Image {
   // no family.
   string family = 3 [(google.api.field_behavior) = IMMUTABLE];
 }
+
+// A named series of images, such as all the images of one operating system
+// release. A machine created or reinstalled from a family gets the family's
+// current image for its machine type. Use GetImageFromFamily to see which
+// image that is.
+message ImageFamily {
+  option (google.api.resource) = {
+    type: "compute.cbws.cloud/ImageFamily"
+    pattern: ["projects/{project}/families/{family}"]
+  };
+
+  // The resource name of the family, such as
+  // `projects/my-project-123/families/ubuntu-2404-lts`.
+  string name = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The project that holds the family, such as `projects/my-project-123`.
+  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+}
