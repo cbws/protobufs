@@ -4,6 +4,7 @@ package cbws.compute.v1alpha1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
 
 // A virtual machine.
 message Machine {
@@ -112,4 +113,8 @@ message Machine {
     // started again.
     STATE_TERMINATED = 8;
   }
+
+  // When the machine was created, which is when it was requested rather than when it first
+  // booted. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 19 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
