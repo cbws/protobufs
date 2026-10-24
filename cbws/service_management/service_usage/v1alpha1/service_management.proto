@@ -19,7 +19,7 @@ option php_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1";
 // A service must be enabled in a project before its API can be used for the
 // project's resources.
 service ServiceUsageService {
-  option (google.api.default_host) = "serviceusage.cbws.xyz";
+  option (google.api.default_host) = "serviceusage.cbws.cloud";
   option (cbws.iam.options.v1alpha1.service) = {service: "serviceusage.cbws.xyz"};
 
   // Lists the services of a project. Requires
@@ -30,7 +30,7 @@ service ServiceUsageService {
   // with its state. So the list can differ between callers.
   rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/services"};
-    option (google.api.method_signature) = "name";
+    option (google.api.method_signature) = "parent";
     option (cbws.iam.options.v1alpha1.resource_type) = "Service";
     option (cbws.iam.options.v1alpha1.action) = "list";
   }
@@ -51,7 +51,7 @@ service ServiceUsageService {
       post: "/v1alpha1/{name=projects/*/services/*}:enable"
       body: "*"
     };
-    option (google.api.method_signature) = "service_name,consumer_id";
+    option (google.api.method_signature) = "name";
     option (google.longrunning.operation_info) = {
       response_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceResponse"
       metadata_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceMetadata"
@@ -73,7 +73,7 @@ service ServiceUsageService {
       post: "/v1alpha1/{name=projects/*/services/*}:disable"
       body: "*"
     };
-    option (google.api.method_signature) = "service_name,consumer_id";
+    option (google.api.method_signature) = "name";
     option (google.longrunning.operation_info) = {
       response_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceResponse"
       metadata_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceMetadata"
@@ -103,7 +103,10 @@ message EnableServiceRequest {
   // Required. The resource name of the service in the project, in the form
   // `projects/{project}/services/{service}`, such as
   // `projects/my-project/services/logging.cbws.xyz`.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "serviceusage.cbws.xyz/Service"}
+  ];
 }
 
 // The metadata of a service enable operation. It has no fields.
@@ -117,7 +120,10 @@ message DisableServiceRequest {
   // Required. The resource name of the service in the project, in the form
   // `projects/{project}/services/{service}`, such as
   // `projects/my-project/services/logging.cbws.xyz`.
-  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "serviceusage.cbws.xyz/Service"}
+  ];
 
   // Optional. Whether to also disable the enabled services that depend on
   // this one. They are disabled first.

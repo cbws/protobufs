@@ -19,7 +19,7 @@ message PrivateNetwork {
 
   // The VPC the private network belongs to, such as
   // `projects/my-project/vpcs/default`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The zone of the private network, such as `nl-ein-1` or `nl-ein-2`.
   // buf:lint:ignore FIELD_SAME_JSON_NAME

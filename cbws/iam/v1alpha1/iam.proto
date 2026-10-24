@@ -26,14 +26,14 @@ option php_namespace = "Cbws\\IAM\\GRPC\\V1alpha1";
 // belongs to a project, and is named by its email address, such as
 // `projects/my-project/serviceAccounts/my-app@my-project.iam-sa.cbws.xyz`.
 service IAMService {
-  option (google.api.default_host) = "iam.cbws.xyz";
+  option (google.api.default_host) = "iam.cbws.cloud";
   option (cbws.iam.options.v1alpha1.service) = {service: "iam.cbws.xyz"};
 
   // Lists the service accounts of a project. Requires
   // `iam.cbws.xyz/ServiceAccount/list` on the project.
   rpc ListServiceAccounts(ListServiceAccountsRequest) returns (ListServiceAccountsResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/serviceAccounts"};
-    option (google.api.method_signature) = "name";
+    option (google.api.method_signature) = "parent";
     option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
     option (cbws.iam.options.v1alpha1.action) = "list";
   }
@@ -123,7 +123,7 @@ service IAMService {
   // for a key's public key.
   rpc ListServiceAccountKeys(ListServiceAccountKeysRequest) returns (ListServiceAccountKeysResponse) {
     option (google.api.http) = {get: "/v1/{parent=projects/*/serviceAccounts/*}/keys"};
-    option (google.api.method_signature) = "name,key_types";
+    option (google.api.method_signature) = "parent,key_types";
     option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
     option (cbws.iam.options.v1alpha1.action) = "list";
   }
@@ -132,7 +132,7 @@ service IAMService {
   // `iam.cbws.xyz/ServiceAccountKey/get` on the key.
   rpc GetServiceAccountKey(GetServiceAccountKeyRequest) returns (ServiceAccountKey) {
     option (google.api.http) = {get: "/v1/{name=projects/*/serviceAccounts/*/keys/*}"};
-    option (google.api.method_signature) = "name,public_key_type";
+    option (google.api.method_signature) = "name";
     option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
     option (cbws.iam.options.v1alpha1.action) = "get";
   }
@@ -149,7 +149,7 @@ service IAMService {
       post: "/v1/{parent=projects/*/serviceAccounts/*}/keys"
       body: "*"
     };
-    option (google.api.method_signature) = "name,private_key_type,key_algorithm";
+    option (google.api.method_signature) = "parent,private_key_type,key_algorithm";
     option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccountKey";
     option (cbws.iam.options.v1alpha1.action) = "create";
   }
@@ -240,7 +240,7 @@ message CreateServiceAccountRequest {
 
   // Optional. The properties of the new service account. Only
   // `display_name` is read.
-  ServiceAccount service_account = 3;
+  ServiceAccount service_account = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The service account delete request.
@@ -263,7 +263,7 @@ message ListServiceAccountKeysRequest {
   ];
 
   // Optional. The key types to list. Empty lists keys of every type.
-  repeated ServiceAccountKeyType key_types = 2;
+  repeated ServiceAccountKeyType key_types = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The service account keys list response.
@@ -293,11 +293,11 @@ message CreateServiceAccountKeyRequest {
 
   // Optional. The format of the returned private key. Only the credentials
   // file format is supported, which is also the default.
-  ServiceAccountPrivateKeyType private_key_type = 2;
+  ServiceAccountPrivateKeyType private_key_type = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The algorithm and size of the key. The default is a 2048-bit
   // RSA key.
-  ServiceAccountKeyAlgorithm key_algorithm = 3;
+  ServiceAccountKeyAlgorithm key_algorithm = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The service account key delete request.
@@ -324,7 +324,7 @@ message GenerateAccessTokenRequest {
 
   // Optional. The lifetime of the token. The only accepted value is one
   // hour, which is also the default.
-  google.protobuf.Duration lifetime = 7;
+  google.protobuf.Duration lifetime = 7 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The access token response.

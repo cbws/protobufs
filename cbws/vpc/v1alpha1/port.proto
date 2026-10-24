@@ -28,7 +28,7 @@ message Port {
 
   // The project that holds the port, such as `projects/my-project`. It is
   // not necessarily the project that owns the private network.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The private network the port is on, such as
   // `projects/other-project/vpcs/default/privateNetworks/shared`. It may

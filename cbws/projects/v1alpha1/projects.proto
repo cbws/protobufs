@@ -21,7 +21,7 @@ option php_namespace = "Cbws\\Projects\\GRPC\\V1alpha1";
 
 // Manages projects and their IAM policies.
 service ProjectsService {
-  option (google.api.default_host) = "projects.cbws.xyz";
+  option (google.api.default_host) = "projects.cbws.cloud";
   option (cbws.iam.options.v1alpha1.service) = {service: "projects.cbws.xyz"};
 
   // Creates a project in an organization and returns it. Requires
@@ -45,7 +45,6 @@ service ProjectsService {
   // either on the project itself or on its organization.
   rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
     option (google.api.http) = {get: "/v1alpha1/projects"};
-    option (google.api.method_signature) = "name";
   }
 
   // Gets a project. Requires `projects.cbws.xyz/Project/get` on the
@@ -143,18 +142,18 @@ message CreateProjectRequest {
 
   // Optional. The properties of the new project. Only `display_name` is
   // read.
-  Project project = 3;
+  Project project = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The project list request.
 message ListProjectsRequest {
   // Optional. The maximum number of projects to return. The default is 10.
-  int32 page_size = 2;
+  int32 page_size = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // Optional. The
   // [next_page_token][cbws.projects.v1alpha1.ListProjectsResponse.next_page_token]
   // of a previous response, to get the next page.
-  string page_token = 3;
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The project list response.
@@ -186,7 +185,7 @@ message UpdateProjectRequest {
 
   // Required. The fields to update. The only accepted path is
   // `display_name`. Any other path fails with INVALID_ARGUMENT.
-  google.protobuf.FieldMask update_mask = 2;
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The project delete request.

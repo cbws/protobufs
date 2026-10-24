@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package cbws.projects.v1alpha1;
 
+import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 
 option go_package = "github.com/cbws/go-cbws-grpc/cbws/projects/v1alpha1";
@@ -24,13 +25,13 @@ message Project {
 
   // Optional. A human-readable name for the project, at most 255
   // characters.
-  string display_name = 2;
+  string display_name = 2 [(google.api.field_behavior) = OPTIONAL];
 
   // The organization the project belongs to, in the form
   // `organizations/{organization}`, where `{organization}` is the
   // organization's UUID.
-  string organization = 3;
+  string organization = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The unique and stable ID of the project, a UUID.
-  string unique_id = 4;
+  string unique_id = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

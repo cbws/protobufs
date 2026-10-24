@@ -20,7 +20,7 @@ message Subnet {
 
   // The private network the subnet belongs to, such as
   // `projects/my-project/vpcs/default/privateNetworks/nl-ein-1`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The prefix of the subnet in CIDR notation, such as `10.0.0.0/24` or
   // `2001:db8::/64`. Required on create.
@@ -34,7 +34,7 @@ message Subnet {
   // The gateway address of the subnet: always the first address after the
   // network address, so `10.0.0.0/24` gives `10.0.0.1` and `2001:db8::/64`
   // gives `2001:db8::1`. It is set by the service.
-  string gateway = 4 [(google.api.field_behavior) = IMMUTABLE];
+  string gateway = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // The subnet list request.

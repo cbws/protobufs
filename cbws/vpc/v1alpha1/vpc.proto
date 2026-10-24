@@ -19,7 +19,7 @@ message Vpc {
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // The project the VPC belongs to, such as `projects/my-project`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // The VPC list request.
