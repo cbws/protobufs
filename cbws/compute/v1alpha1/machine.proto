@@ -19,12 +19,12 @@ message Machine {
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // The project that holds the machine, such as `projects/my-project-123`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The machine type, such as `zones/nl-ein-1/types/g4.2`. The zone of the
   // type is the zone the machine runs in. On create, `machineTypes/g4.2` lets
   // CBWS choose a zone that offers the type. Change it with ResizeMachine.
-  string type = 3 [(google.api.field_behavior) = IMMUTABLE];
+  string type = 3 [(google.api.field_behavior) = REQUIRED];
 
   // The image the machine is installed from. On create, give an image
   // family, such as `projects/my-project-123/families/ubuntu-2404-lts`, to
@@ -33,7 +33,7 @@ message Machine {
   string image = 10 [(google.api.field_behavior) = REQUIRED];
 
   // The hostname the machine boots with. Defaults to the machine id.
-  string hostname = 4 [(google.api.field_behavior) = REQUIRED];
+  string hostname = 4 [(google.api.field_behavior) = OPTIONAL];
 
   // The IPv4 address the machine holds. Empty on a machine with no IPv4 address.
   string address = 7 [(google.api.field_behavior) = OUTPUT_ONLY];

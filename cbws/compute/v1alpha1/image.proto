@@ -17,7 +17,7 @@ message Image {
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // The project that holds the image, such as `projects/my-project-123`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The family the image belongs to, such as
   // `projects/my-project-123/families/ubuntu-2404-lts`. Empty for an image in
@@ -40,5 +40,5 @@ message ImageFamily {
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // The project that holds the family, such as `projects/my-project-123`.
-  string parent = 2 [(google.api.field_behavior) = IMMUTABLE];
+  string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

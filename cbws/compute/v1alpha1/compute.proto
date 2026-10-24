@@ -378,7 +378,7 @@ message ResizeMachineRequest {
   // `zones/nl-ein-1/types/g4.2`, or `machineTypes/g4.2` for that type in the
   // machine's current zone. The type must be offered in the zone the machine
   // runs in. A resize to the machine's current type finishes without change.
-  string type = 2 [(google.api.field_behavior) = INPUT_ONLY];
+  string type = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The result of a resize machine operation.
@@ -418,7 +418,7 @@ message ListMachineTypesRequest {
   // Use `zones/-` to list the machine types of every zone.
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {type: "compute.cbws.cloud/Zone"}
+    (google.api.resource_reference) = {child_type: "compute.cbws.cloud/MachineType"}
   ];
 
   // Optional. The maximum number of machine types to return. The service may
