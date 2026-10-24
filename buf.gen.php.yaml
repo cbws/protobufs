@@ -1,0 +1,79 @@
+# Generates the PHP package cbws/php-cbws-grpc from this repository: buf generate --template
+# buf.gen.php.yaml, with protoc and grpc_php_plugin on the path. The messages and gRPC clients land
+# under Cbws\Grpc, and the descriptor metadata under GPBMetadata\Cbws. google.longrunning is
+# generated into Cbws\Grpc\Longrunning too, so the package needs only grpc/grpc, google/protobuf and
+# google/common-protos.
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: php_namespace
+      path: cbws/compute/v1alpha1
+      value: Cbws\Grpc\Compute\V1alpha1
+    - file_option: php_namespace
+      path: cbws/iam/v1alpha1
+      value: Cbws\Grpc\Iam\V1alpha1
+    - file_option: php_namespace
+      path: cbws/iam/options/v1alpha1
+      value: Cbws\Grpc\Iam\Options\V1alpha1
+    - file_option: php_namespace
+      path: cbws/iam/policy/v1alpha1
+      value: Cbws\Grpc\Iam\Policy\V1alpha1
+    - file_option: php_namespace
+      path: cbws/projects/v1alpha1
+      value: Cbws\Grpc\Projects\V1alpha1
+    - file_option: php_namespace
+      path: cbws/service_management/service_usage/v1alpha1
+      value: Cbws\Grpc\ServiceManagement\ServiceUsage\V1alpha1
+    - file_option: php_namespace
+      path: cbws/vpc/v1alpha1
+      value: Cbws\Grpc\Vpc\V1alpha1
+    - file_option: php_namespace
+      path: google/longrunning
+      value: Cbws\Grpc\Longrunning
+
+    - file_option: php_metadata_namespace
+      path: cbws/compute/v1alpha1
+      value: GPBMetadata\Cbws\Compute
+    - file_option: php_metadata_namespace
+      path: cbws/iam/v1alpha1
+      value: GPBMetadata\Cbws\Iam
+    - file_option: php_metadata_namespace
+      path: cbws/iam/options/v1alpha1
+      value: GPBMetadata\Cbws\Iam\Options
+    - file_option: php_metadata_namespace
+      path: cbws/iam/policy/v1alpha1
+      value: GPBMetadata\Cbws\Iam\Policy
+    - file_option: php_metadata_namespace
+      path: cbws/projects/v1alpha1
+      value: GPBMetadata\Cbws\Projects
+    - file_option: php_metadata_namespace
+      path: cbws/service_management/service_usage/v1alpha1
+      value: GPBMetadata\Cbws\ServiceManagement\ServiceUsage
+    - file_option: php_metadata_namespace
+      path: cbws/vpc/v1alpha1
+      value: GPBMetadata\Cbws\Vpc
+    - file_option: php_metadata_namespace
+      path: google/longrunning
+      value: GPBMetadata\Cbws\Longrunning
+    # The generated code loads the descriptors of these imports from google/common-protos, which
+    # names its metadata classes this way.
+    - file_option: php_metadata_namespace
+      path: google/api
+      value: GPBMetadata\Google\Api
+    - file_option: php_metadata_namespace
+      path: google/rpc
+      value: GPBMetadata\Google\Rpc
+
+# Both generators run locally: protoc's built-in PHP generator for the messages, and the gRPC PHP
+# plugin for the clients. The image that generates the package pins protoc 30.2 and gRPC 1.78.1.
+plugins:
+  - protoc_builtin: php
+    out: gen/php
+  - local: grpc_php_plugin
+    out: gen/php
+inputs:
+  - directory: .
+  - module: buf.build/googleapis/googleapis
+    paths:
+      - google/longrunning
