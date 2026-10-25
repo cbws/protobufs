@@ -1,0 +1,44 @@
+# Generates the Go module go.cbws.cloud/api from this repository: buf generate --template
+# buf.gen.go.yaml, with protoc-gen-go and protoc-gen-go-grpc on the path. Each package lands at its
+# path without the leading cbws/, so cbws/vpc/v1alpha1 is go.cbws.cloud/api/vpc/v1alpha1.
+#
+# Every package needs a go_package here. A package without one has no Go import path, which fails
+# the generation rather than placing it somewhere unexpected.
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      path: cbws/compute/v1alpha1
+      value: go.cbws.cloud/api/compute/v1alpha1
+    - file_option: go_package
+      path: cbws/iam/v1alpha1
+      value: go.cbws.cloud/api/iam/v1alpha1
+    - file_option: go_package
+      path: cbws/iam/options/v1alpha1
+      value: go.cbws.cloud/api/iam/options/v1alpha1
+    - file_option: go_package
+      path: cbws/iam/policy/v1alpha1
+      value: go.cbws.cloud/api/iam/policy/v1alpha1
+    - file_option: go_package
+      path: cbws/projects/v1alpha1
+      value: go.cbws.cloud/api/projects/v1alpha1
+    - file_option: go_package
+      path: cbws/service_management/service_usage/v1alpha1
+      value: go.cbws.cloud/api/service_management/service_usage/v1alpha1
+    - file_option: go_package
+      path: cbws/vpc/v1alpha1
+      value: go.cbws.cloud/api/vpc/v1alpha1
+
+# Both plugins run locally. The image that generates the module pins protoc-gen-go 1.36.6 and
+# protoc-gen-go-grpc 1.6.1. The imports from googleapis, such as google.longrunning, use the Go
+# packages Google publishes for them, so they are not generated here.
+plugins:
+  - local: protoc-gen-go
+    out: gen/go
+    opt: module=go.cbws.cloud/api
+  - local: protoc-gen-go-grpc
+    out: gen/go
+    opt: module=go.cbws.cloud/api
+inputs:
+  - directory: .
