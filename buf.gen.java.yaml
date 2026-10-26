@@ -1,0 +1,53 @@
+# Generates the Java and Kotlin libraries of cbws/kotlin-cbws-grpc from this repository: buf
+# generate --template buf.gen.java.yaml, with protoc, protoc-gen-grpc-java and protoc-gen-grpc-kotlin
+# on the path. Each package lands at its path without the leading cbws, under cloud.cbws.api, so
+# cbws.vpc.v1alpha1 is cloud.cbws.api.vpc.v1alpha1.
+#
+# The Java output, the messages and the gRPC clients, is usable from any JVM language. The Kotlin
+# output adds the message builders and coroutine clients on top of it, and needs the Java output to
+# compile.
+version: v2
+managed:
+  enabled: true
+  disable:
+    # googleapis declares its own Java packages, which the libraries Google publishes for it use.
+    - module: buf.build/googleapis/googleapis
+  override:
+    - file_option: java_package
+      path: cbws/compute/v1alpha1
+      value: cloud.cbws.api.compute.v1alpha1
+    - file_option: java_package
+      path: cbws/iam/v1alpha1
+      value: cloud.cbws.api.iam.v1alpha1
+    - file_option: java_package
+      path: cbws/iam/options/v1alpha1
+      value: cloud.cbws.api.iam.options.v1alpha1
+    - file_option: java_package
+      path: cbws/iam/policy/v1alpha1
+      value: cloud.cbws.api.iam.policy.v1alpha1
+    - file_option: java_package
+      path: cbws/projects/v1alpha1
+      value: cloud.cbws.api.projects.v1alpha1
+    - file_option: java_package
+      path: cbws/service_management/service_usage/v1alpha1
+      value: cloud.cbws.api.service_management.service_usage.v1alpha1
+    - file_option: java_package
+      path: cbws/vpc/v1alpha1
+      value: cloud.cbws.api.vpc.v1alpha1
+
+# The generators run locally. The image that generates the libraries pins protoc 30.2, grpc-java
+# 1.78.0 and grpc-kotlin 1.5.0. The imports from googleapis, such as google.longrunning, use the
+# libraries Google publishes for them, proto-google-common-protos and grpc-google-common-protos, so
+# they are not generated here. A second copy of those classes would clash with Google's on the
+# classpath.
+plugins:
+  - protoc_builtin: java
+    out: gen/java/java
+  - local: protoc-gen-grpc-java
+    out: gen/java/java
+  - protoc_builtin: kotlin
+    out: gen/java/kotlin
+  - local: protoc-gen-grpc-kotlin
+    out: gen/java/kotlin
+inputs:
+  - directory: .
