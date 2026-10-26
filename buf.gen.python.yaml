@@ -1,0 +1,24 @@
+# Generates the Python package cbws-grpc from this repository: buf generate --template
+# buf.gen.python.yaml, with protoc and grpc_python_plugin on the path. Each package lands at its
+# proto path, so cbws/vpc/v1alpha1 is the module cbws.vpc.v1alpha1. cbws is a namespace package, so
+# other distributions can add modules under it.
+#
+# The imports from googleapis, such as google.longrunning, use the Python modules Google publishes in
+# googleapis-common-protos, so they are not generated here.
+version: v2
+managed:
+  enabled: true
+
+# All three generators run locally: protoc's built-in Python generator for the messages and its
+# type stubs, and the gRPC Python plugin for the clients. The image that generates the package pins
+# protoc 30.2 and gRPC 1.78.1. The protobuf runtime refuses code from a newer protoc, so protoc 30.2
+# makes protobuf 6.30.2 the oldest release the package runs on.
+plugins:
+  - protoc_builtin: python
+    out: gen/python
+  - protoc_builtin: pyi
+    out: gen/python
+  - local: grpc_python_plugin
+    out: gen/python
+inputs:
+  - directory: .
