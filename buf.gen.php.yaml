@@ -1,8 +1,8 @@
 # Generates the PHP package cbws/php-cbws-grpc from this repository: buf generate --template
-# buf.gen.php.yaml, with protoc and grpc_php_plugin on the path. The messages and gRPC clients land
+# buf.gen.php.yaml, with protoc and protoc-gen-php-cbws on the path. The messages and clients land
 # under Cbws\Grpc, and the descriptor metadata under GPBMetadata\Cbws. google.longrunning is
-# generated into Cbws\Grpc\Longrunning too, so the package needs only grpc/grpc, google/protobuf and
-# google/common-protos.
+# generated into Cbws\Grpc\Longrunning too, so the package does not need google/longrunning. The
+# clients call the Cbws\Grpc\Transport runtime the package ships beside them, over gRPC or gRPC-Web.
 version: v2
 managed:
   enabled: true
@@ -65,13 +65,15 @@ managed:
       path: google/rpc
       value: GPBMetadata\Google\Rpc
 
-# Both generators run locally: protoc's built-in PHP generator for the messages, and the gRPC PHP
-# plugin for the clients. The image that generates the package pins protoc 30.2 and gRPC 1.78.1.
+# Both generators run locally: protoc's built-in PHP generator for the messages, and
+# protoc-gen-php-cbws for the clients. The image that generates the package pins protoc 30.2.
 plugins:
   - protoc_builtin: php
     out: gen/php
-  - local: grpc_php_plugin
+  - local: protoc-gen-php-cbws
     out: gen/php
+    # One run over every file, as for the internal package.
+    strategy: all
 inputs:
   - directory: .
   - module: buf.build/googleapis/googleapis
