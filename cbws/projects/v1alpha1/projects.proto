@@ -98,6 +98,8 @@ service ProjectsService {
   rpc GetPolicy(cbws.iam.policy.v1alpha1.GetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
     option (google.api.http) = {post: "/v1alpha1/{resource}:getPolicy"};
     option (google.api.method_signature) = "resource";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "getIAMPolicy";
   }
 
   // Replaces the IAM policy of a project. Requires
@@ -109,6 +111,8 @@ service ProjectsService {
       body: "*"
     };
     option (google.api.method_signature) = "resource,policy";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Project";
+    option (cbws.iam.options.v1alpha1.action) = "setIAMPolicy";
   }
 
   // Returns which of the given permissions the caller has on a project. The

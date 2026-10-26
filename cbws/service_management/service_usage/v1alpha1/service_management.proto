@@ -56,6 +56,8 @@ service ServiceUsageService {
       response_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceResponse"
       metadata_type: "cbws.service_management.service_usage.v1alpha1.EnableServiceMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Service";
+    option (cbws.iam.options.v1alpha1.action) = "enable";
   }
 
   // Disables a service in a project, so that it can no longer be used
@@ -78,6 +80,8 @@ service ServiceUsageService {
       response_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceResponse"
       metadata_type: "cbws.service_management.service_usage.v1alpha1.DisableServiceMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Service";
+    option (cbws.iam.options.v1alpha1.action) = "disable";
   }
 }
 

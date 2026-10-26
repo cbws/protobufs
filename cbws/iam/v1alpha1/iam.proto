@@ -99,6 +99,8 @@ service IAMService {
       body: "*"
     };
     option (google.api.method_signature) = "name,delegates,payload";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "signJwt";
   }
 
   // Signs a blob with one of the service account's system-managed keys.
@@ -112,6 +114,8 @@ service IAMService {
       body: "*"
     };
     option (google.api.method_signature) = "name,delegates,payload";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "signBlob";
   }
 
   // Lists the keys of a service account, newest first. Requires
@@ -177,6 +181,8 @@ service IAMService {
   rpc GetPolicy(cbws.iam.policy.v1alpha1.GetPolicyRequest) returns (cbws.iam.policy.v1alpha1.Policy) {
     option (google.api.http) = {post: "/v1alpha1/{resource}:getPolicy"};
     option (google.api.method_signature) = "resource";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "getIAMPolicy";
   }
 
   // Replaces the IAM policy of a service account. Requires
@@ -194,6 +200,8 @@ service IAMService {
       body: "*"
     };
     option (google.api.method_signature) = "resource,policy";
+    option (cbws.iam.options.v1alpha1.resource_type) = "ServiceAccount";
+    option (cbws.iam.options.v1alpha1.action) = "setIAMPolicy";
   }
 }
 

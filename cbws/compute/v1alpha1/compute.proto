@@ -5,6 +5,7 @@ package cbws.compute.v1alpha1;
 import "cbws/compute/v1alpha1/image.proto";
 import "cbws/compute/v1alpha1/machine.proto";
 import "cbws/compute/v1alpha1/machine_type.proto";
+import "cbws/iam/options/v1alpha1/options.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
@@ -17,17 +18,22 @@ import "google/protobuf/timestamp.proto";
 // boot from.
 service ComputeService {
   option (google.api.default_host) = "compute.cbws.cloud";
+  option (cbws.iam.options.v1alpha1.service) = {service: "compute.cbws.cloud"};
 
   // Lists the machines in a project.
   rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/machines"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets a machine.
   rpc GetMachine(GetMachineRequest) returns (Machine) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "get";
   }
 
   // Returns a URL that opens the console of a running machine in a browser.
@@ -35,6 +41,8 @@ service ComputeService {
   rpc RequestMachineConsole(RequestMachineConsoleRequest) returns (RequestMachineConsoleResponse) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/machines/*}:request-console"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "console";
   }
 
   // Creates a machine and starts it.
@@ -48,6 +56,8 @@ service ComputeService {
       response_type: "Machine"
       metadata_type: "cbws.compute.v1alpha1.CreateMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "create";
   }
 
   // Stops a machine. The machine keeps its disk and can be started again.
@@ -57,6 +67,8 @@ service ComputeService {
       response_type: "StopMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.StopMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "stop";
   }
 
   // Starts a stopped machine.
@@ -66,6 +78,8 @@ service ComputeService {
       response_type: "StartMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.StartMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "start";
   }
 
   // Power-cycles a machine, like pressing its reset button. The operating
@@ -76,6 +90,8 @@ service ComputeService {
       response_type: "ResetMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.ResetMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "reset";
   }
 
   // Replaces the operating system on a machine with a new image. The data on
@@ -89,6 +105,8 @@ service ComputeService {
       response_type: "ReinstallMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.ReinstallMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "reinstall";
   }
 
   // Changes a machine to another machine type in the same zone. The machine
@@ -102,6 +120,8 @@ service ComputeService {
       response_type: "ResizeMachineResponse"
       metadata_type: "cbws.compute.v1alpha1.ResizeMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "resize";
   }
 
   // Deletes a machine and its disk.
@@ -112,6 +132,8 @@ service ComputeService {
       response_type: "google.protobuf.Empty"
       metadata_type: "cbws.compute.v1alpha1.DeleteMachineMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Machine";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
   }
 
   // Lists the machine types offered in a zone, or in every zone.
@@ -130,6 +152,8 @@ service ComputeService {
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/images"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets an image.
@@ -142,12 +166,16 @@ service ComputeService {
   rpc ListImageFamilies(ListImageFamiliesRequest) returns (ListImageFamiliesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/families"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets an image family.
   rpc GetImageFamily(GetImageFamilyRequest) returns (ImageFamily) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/families/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Returns the image a machine of the given type would boot from the family
@@ -155,6 +183,8 @@ service ComputeService {
   rpc GetImageFromFamily(GetImageFromFamilyRequest) returns (Image) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/families/*}:image"};
     option (google.api.method_signature) = "name,machine_type";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 }
 

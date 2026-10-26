@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package cbws.vpc.v1alpha1;
 
+import "cbws/iam/options/v1alpha1/options.proto";
 import "cbws/iam/policy/v1alpha1/policy.proto";
 import "cbws/iam/policy/v1alpha1/request_response.proto";
 import "cbws/vpc/v1alpha1/port.proto";
@@ -26,18 +27,23 @@ import "google/longrunning/operations.proto";
 // service on the same host.
 service VpcService {
   option (google.api.default_host) = "vpc.cbws.cloud";
+  option (cbws.iam.options.v1alpha1.service) = {service: "vpc.cbws.cloud"};
 
   // Lists the VPCs of a project. Requires `vpc.cbws.cloud/Vpc/list` on the
   // project.
   rpc ListVpcs(ListVpcsRequest) returns (ListVpcsResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/vpcs"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Vpc";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets a VPC. Requires `vpc.cbws.cloud/Vpc/get` on the VPC.
   rpc GetVpc(GetVpcRequest) returns (Vpc) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Vpc";
+    option (cbws.iam.options.v1alpha1.action) = "get";
   }
 
   // Deletes a VPC. Requires `vpc.cbws.cloud/Vpc/delete` on the VPC.
@@ -51,6 +57,8 @@ service VpcService {
       response_type: "google.protobuf.Empty"
       metadata_type: "cbws.vpc.v1alpha1.DeleteVpcMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Vpc";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
   }
 
   // Lists the private networks of a VPC. Requires
@@ -58,6 +66,8 @@ service VpcService {
   rpc ListPrivateNetworks(ListPrivateNetworksRequest) returns (ListPrivateNetworksResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*}/privateNetworks"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "PrivateNetwork";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets a private network. Requires `vpc.cbws.cloud/PrivateNetwork/get` on
@@ -65,6 +75,8 @@ service VpcService {
   rpc GetPrivateNetwork(GetPrivateNetworkRequest) returns (PrivateNetwork) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "PrivateNetwork";
+    option (cbws.iam.options.v1alpha1.action) = "get";
   }
 
   // Deletes a private network. Requires
@@ -76,6 +88,8 @@ service VpcService {
       response_type: "google.protobuf.Empty"
       metadata_type: "cbws.vpc.v1alpha1.DeletePrivateNetworkMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "PrivateNetwork";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
   }
 
   // Lists the subnets of a private network. Requires
@@ -83,12 +97,16 @@ service VpcService {
   rpc ListSubnets(ListSubnetsRequest) returns (ListSubnetsResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/subnets"};
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Subnet";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets a subnet. Requires `vpc.cbws.cloud/Subnet/get` on the subnet.
   rpc GetSubnet(GetSubnetRequest) returns (Subnet) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/vpcs/*/privateNetworks/*/subnets/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Subnet";
+    option (cbws.iam.options.v1alpha1.action) = "get";
   }
 
   // Creates a subnet in a private network, with a prefix you choose.
@@ -104,6 +122,8 @@ service VpcService {
       response_type: "cbws.vpc.v1alpha1.CreateSubnetResponse"
       metadata_type: "cbws.vpc.v1alpha1.CreateSubnetMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Subnet";
+    option (cbws.iam.options.v1alpha1.action) = "create";
   }
 
   // Deletes a subnet and frees its prefix. Requires
@@ -115,6 +135,8 @@ service VpcService {
       response_type: "cbws.vpc.v1alpha1.DeleteSubnetResponse"
       metadata_type: "cbws.vpc.v1alpha1.DeleteSubnetMetadata"
     };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Subnet";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
   }
 
   // Lists ports, either the ports a project holds or the ports on a private
@@ -127,6 +149,8 @@ service VpcService {
         {get: "/v1alpha1/{parent=projects/*/vpcs/*/privateNetworks/*}/ports"}]
     };
     option (google.api.method_signature) = "parent";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Port";
+    option (cbws.iam.options.v1alpha1.action) = "list";
   }
 
   // Gets a port. Requires `vpc.cbws.cloud/Port/get` on the port, or on the
@@ -134,6 +158,8 @@ service VpcService {
   rpc GetPort(GetPortRequest) returns (Port) {
     option (google.api.http) = {get: "/v1alpha1/{name=projects/*/ports/*}"};
     option (google.api.method_signature) = "name";
+    option (cbws.iam.options.v1alpha1.resource_type) = "Port";
+    option (cbws.iam.options.v1alpha1.action) = "get";
   }
 
   // Gets the IAM policy of a VPC or a private network. Requires
