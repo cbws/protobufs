@@ -31,7 +31,7 @@ message Service {
   ServiceState state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
-// The name and title of a service.
+// The name, title and launch stage of a service.
 message ServiceConfig {
   // The name of the service, such as `logging.cbws.xyz`. It is the last
   // segment of the service's resource name.
@@ -39,6 +39,27 @@ message ServiceConfig {
 
   // The human-readable title of the service.
   string title = 2;
+
+  // The service's launch stage.
+  LaunchStage launch_stage = 3;
+}
+
+// How far a service is from general availability, as the CBWS launch stages
+// standard defines it.
+enum LaunchStage {
+  // Not specified. Never returned.
+  LAUNCH_STAGE_UNSPECIFIED = 0;
+
+  // Only selected projects can use the service. It has no SLA, and it can
+  // still change.
+  LAUNCH_STAGE_PRIVATE_PREVIEW = 2;
+
+  // Any project can enable the service, but it has no SLA, and its API can
+  // still change.
+  LAUNCH_STAGE_PREVIEW = 3;
+
+  // The service is generally available.
+  LAUNCH_STAGE_GA = 4;
 }
 
 // Whether a service is enabled in a project.
