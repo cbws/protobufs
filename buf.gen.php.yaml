@@ -64,6 +64,9 @@ managed:
     - file_option: php_metadata_namespace
       path: google/rpc
       value: GPBMetadata\Google\Rpc
+    - file_option: php_metadata_namespace
+      path: google/type
+      value: GPBMetadata\Google\Type
 
 # Both generators run locally: protoc's built-in PHP generator for the messages, and
 # protoc-gen-php-cbws for the clients. The image that generates the package pins protoc 30.2.
