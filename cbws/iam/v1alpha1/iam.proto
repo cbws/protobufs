@@ -247,7 +247,7 @@ message CreateServiceAccountRequest {
   string account_id = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Optional. The properties of the new service account. Only
-  // `display_name` is read.
+  // `display_name` and `description` are read.
   ServiceAccount service_account = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
