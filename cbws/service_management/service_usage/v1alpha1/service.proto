@@ -4,6 +4,7 @@ package cbws.service_management.service_usage.v1alpha1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/cbws/go-cbws-grpc/cbws/service-usage/v1alpha1";
 option php_metadata_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1\\Metadata";
@@ -24,14 +25,16 @@ message Service {
   // The project, such as `projects/my-project`.
   string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // The name and title of the service.
+  // The name and title of the service, and what it meters.
   ServiceConfig config = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Whether the service is enabled in the project.
   ServiceState state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
-// The name, title and launch stage of a service.
+// The name, title and launch stage of a service, and the metrics and quota
+// that apply to its use. The metrics and quota are those of the service's
+// current configuration, the same for every project.
 message ServiceConfig {
   // The name of the service, such as `logging.cbws.xyz`. It is the last
   // segment of the service's resource name.
@@ -42,6 +45,79 @@ message ServiceConfig {
 
   // The service's launch stage.
   LaunchStage launch_stage = 3;
+
+  // What the service does, in one or two sentences, such as "Provision and
+  // manage scalable, high-performance machines for your workloads." At most
+  // 128 characters. Empty if the service has no description.
+  string description = 6;
+
+  // The quantities the service measures for a project that uses it, such as
+  // API requests or machine hours. Returned only when the request's read
+  // mask asks for it, or has no read mask.
+  repeated Metric metrics = 4;
+
+  // What each method of the service costs against the metrics, and how much
+  // of each metric a project may use. Returned only when the request's read
+  // mask asks for it, or has no read mask.
+  Quota quota = 5;
+}
+
+// A quantity a service measures for a project that uses it.
+message Metric {
+  // The resource name of the metric, in the form
+  // `services/{service}/metrics/{metric}`, such as
+  // `services/compute.cbws.cloud/metrics/requests`. Usage reports and quota
+  // refer to the metric by this name.
+  string name = 1;
+
+  // The human-readable name of the metric, such as `API requests`.
+  string display_name = 2;
+
+  // The unit the metric is measured in, such as `h` for hours, `h{core}` for
+  // core hours, `GiBy.h` for gibibyte hours or `{request}` for a count of
+  // requests. The grammar is a subset of UCUM. Empty if the metric declares
+  // no unit.
+  string unit = 3;
+
+  // Whether the project is billed for its use of the metric.
+  bool billed = 4;
+}
+
+// The cost of a service's methods against its metrics, and the limits on
+// those metrics.
+message Quota {
+  // What each method costs. A method that matches no rule costs nothing.
+  repeated MetricRule metric_rules = 1;
+
+  // How much of each metric a project may use.
+  repeated QuotaLimit limits = 2;
+}
+
+// The cost of one or more methods against the service's metrics.
+message MetricRule {
+  // The method the rule applies to, as its fully qualified name, such as
+  // `cbws.compute.v1alpha1.ComputeService.CreateMachine`. `*` applies to
+  // every method that no other rule names.
+  string selector = 1;
+
+  // The amount each call adds to a metric, keyed by the metric's resource
+  // name.
+  map<string, int64> metric_costs = 2;
+}
+
+// The most of one metric a project may use.
+message QuotaLimit {
+  // The resource name of the metric the limit applies to, in the form
+  // `services/{service}/metrics/{metric}`.
+  string metric = 1;
+
+  // The most a project may use, per `duration` if it is set, or at any one
+  // time if it is not.
+  int64 default_limit = 2;
+
+  // The window the limit applies over, such as `100s`. Unset means the limit
+  // is on the amount in use at any one time, not on a rate.
+  google.protobuf.Duration duration = 3;
 }
 
 // How far a service is from general availability, as the CBWS launch stages

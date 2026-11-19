@@ -9,12 +9,13 @@ import "google/api/client.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/longrunning/operations.proto";
+import "google/protobuf/field_mask.proto";
 
 option go_package = "github.com/cbws/go-cbws-grpc/cbws/service-usage/v1alpha1";
 option php_metadata_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1\\Metadata";
 option php_namespace = "Cbws\\ServiceUsage\\GRPC\\V1alpha1";
 
-// Lists, enables and disables the CBWS services of a project.
+// Lists, describes, enables and disables the CBWS services of a project.
 //
 // A service must be enabled in a project before its API can be used for the
 // project's resources.
@@ -33,6 +34,18 @@ service ServiceUsageService {
     option (google.api.method_signature) = "parent";
     option (cbws.iam.options.v1alpha1.resource_type) = "Service";
     option (cbws.iam.options.v1alpha1.action) = "list";
+  }
+
+  // Gets a service of a project. Requires `serviceusage.cbws.xyz/Service/get`
+  // on the project.
+  //
+  // The service must be enabled in the project, or the caller must have
+  // `servicemanagement.cbws.xyz/Service/bind` on it, the same as for
+  // [ListServices][cbws.service_management.service_usage.v1alpha1.ServiceUsageService.ListServices].
+  // Otherwise the call fails with NOT_FOUND, also when the service exists.
+  rpc GetService(GetServiceRequest) returns (Service) {
+    option (google.api.http) = {get: "/v1alpha1/{name=projects/*/services/*}"};
+    option (google.api.method_signature) = "name";
   }
 
   // Enables a service in a project, together with the services it depends
@@ -93,6 +106,11 @@ message ListServicesRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
   ];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: `services.config.metrics` and `services.config.quota`. Other
+  // fields are always returned. Without a mask, both are read.
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The service list response.
@@ -100,6 +118,22 @@ message ListServicesResponse {
   // The services, in no particular order. All of them are returned in one
   // response.
   repeated Service services = 1;
+}
+
+// The service get request.
+message GetServiceRequest {
+  // Required. The resource name of the service in the project, in the form
+  // `projects/{project}/services/{service}`, such as
+  // `projects/my-project/services/logging.cbws.xyz`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "serviceusage.cbws.xyz/Service"}
+  ];
+
+  // Optional. The fields that take extra time to read and are wanted in the
+  // response: `config.metrics` and `config.quota`. Other fields are always
+  // returned. Without a mask, both are read.
+  google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // The service enable request.
