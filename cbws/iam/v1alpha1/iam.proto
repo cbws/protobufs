@@ -342,6 +342,10 @@ message GenerateAccessTokenResponse {
 
   // When the token expires.
   google.protobuf.Timestamp expire_time = 3;
+
+  // The unique identifier (`jti`) of the generated access token, for audit
+  // correlation.
+  string token_id = 4;
 }
 
 // The JWT signing request.
