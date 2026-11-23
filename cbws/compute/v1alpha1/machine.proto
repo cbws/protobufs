@@ -18,6 +18,10 @@ message Machine {
   // request's `parent` and `machine_id`.
   string name = 1 [(google.api.field_behavior) = IMMUTABLE];
 
+  // A unique identifier for the machine, a UUID assigned by CBWS. A machine created later with
+  // the same name has a different uid, which is what tells the two and their operations apart.
+  string uid = 20 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // The project that holds the machine, such as `projects/my-project-123`.
   string parent = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 

@@ -316,6 +316,17 @@ message StopMachineResponse {}
 
 // The metadata of a stop machine operation.
 message StopMachineMetadata {
+  // The machine being stopped, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is deleted.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -338,6 +349,17 @@ message StartMachineResponse {}
 
 // The metadata of a start machine operation.
 message StartMachineMetadata {
+  // The machine being started, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is deleted.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -360,6 +382,17 @@ message ResetMachineResponse {}
 
 // The metadata of a reset machine operation.
 message ResetMachineMetadata {
+  // The machine being reset, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is deleted.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -388,6 +421,23 @@ message ReinstallMachineResponse {}
 
 // The metadata of a reinstall machine operation.
 message ReinstallMachineMetadata {
+  // The machine being reinstalled, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is deleted.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The single image the machine is reinstalled from, such as
+  // `projects/my-project-123/images/ubuntu-2404-lts-20260901`. When the request
+  // gave an image family, this is the image the family resolved to, so it keeps
+  // naming what was installed after the family moves on.
+  string image = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -416,6 +466,26 @@ message ResizeMachineResponse {}
 
 // The metadata of a resize machine operation.
 message ResizeMachineMetadata {
+  // The machine being resized, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is deleted.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The machine type the machine had before the resize, such as
+  // `zones/nl-ein-1/types/g4.1`.
+  string previous_type = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The machine type the machine is resized to, such as
+  // `zones/nl-ein-1/types/g4.2`. Always names a zone, also when the request
+  // gave `machineTypes/g4.2`.
+  string type = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
@@ -435,6 +505,17 @@ message DeleteMachineRequest {
 
 // The metadata of a delete machine operation.
 message DeleteMachineMetadata {
+  // The machine being deleted, such as `projects/my-project-123/machines/web-1`.
+  // It stays set after the machine is gone.
+  string machine = 3 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The [uid][cbws.compute.v1alpha1.Machine.uid] of that machine, which tells it
+  // apart from a machine created later with the same name.
+  string machine_uid = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // When the operation was created. Unset where the time is not known.
   google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 
