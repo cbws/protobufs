@@ -4,6 +4,7 @@ package cbws.compute.v1alpha1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
 
 // The request to get the agent of a machine.
 message GetMachineAgentRequest {
@@ -13,4 +14,29 @@ message GetMachineAgentRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {type: "compute.cbws.cloud/MachineAgent"}
   ];
+}
+
+// The request for a URL that opens a connection to a port on a machine.
+message RequestMachineAgentForwardRequest {
+  // Required. The resource name of the agent, such as
+  // `projects/my-project-123/machines/web-1/agent`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/MachineAgent"}
+  ];
+
+  // Required. The port on the machine's loopback to connect to, from 1 to
+  // 65535, such as 22 for SSH.
+  int32 port = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// A URL that opens a connection to a port on a machine.
+message RequestMachineAgentForwardResponse {
+  // The websocket URL that opens the connection. Treat it as a secret: it
+  // gives access to the port on the machine.
+  string url = 1;
+
+  // When the URL stops opening a connection. A connection opened before
+  // then is not ended by it.
+  google.protobuf.Timestamp expire_time = 2;
 }
