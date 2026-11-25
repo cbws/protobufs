@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
+
+// The CBWS agent of a machine: the program in the guest that lets the platform reach into the
+// machine, as the platform last saw it. Every machine has one, whether or not the agent is
+// installed; [state][cbws.compute.v1alpha1.MachineAgent.state] says which.
+//
+// Whether a machine gets the agent is chosen on the machine itself, with
+// [agent_installation][cbws.compute.v1alpha1.Machine.agent_installation].
+message MachineAgent {
+  option (google.api.resource) = {
+    type: "compute.cbws.cloud/MachineAgent"
+    pattern: ["projects/{project}/machines/{machine}/agent"]
+  };
+
+  // The resource name of the agent, such as `projects/my-project-123/machines/web-1/agent`.
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The state of an agent.
+  enum State {
+    // The state is not known right now, such as shortly after the platform restarts. Read it
+    // again later.
+    STATE_UNSPECIFIED = 0;
+
+    // The machine does not run the agent: it was created or reinstalled without it, or from an
+    // image the agent is not published for.
+    STATE_NOT_INSTALLED = 1;
+
+    // The agent is connected to the platform and answers it.
+    STATE_CONNECTED = 2;
+
+    // The agent is not connected to the platform. The machine may be stopped or still booting, or
+    // the agent may have failed to install, been stopped or been removed in the guest.
+    STATE_DISCONNECTED = 3;
+
+    // The agent is connected to the platform but does not answer it as healthy.
+    STATE_UNHEALTHY = 4;
+  }
+
+  // The state of the agent.
+  State state = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the agent's current connection to the platform opened. Unset while it has none.
+  google.protobuf.Timestamp connect_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the platform last checked the agent's health. Unset while it has no connection.
+  google.protobuf.Timestamp check_time = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // A feature of the agent that the machine's owner can switch off in the guest.
+  message Feature {
+    // The state of a feature.
+    enum State {
+      // The state is not known.
+      STATE_UNSPECIFIED = 0;
+
+      // The feature is on.
+      STATE_ENABLED = 1;
+
+      // The machine's owner switched the feature off in the guest.
+      STATE_DISABLED = 2;
+
+      // The agent is too old to report the feature.
+      STATE_UNSUPPORTED = 3;
+    }
+
+    // The name of the feature: `exec` or `forward`.
+    string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // The state of the feature, as the agent last reported it.
+    State state = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+  }
+
+  // The agent's features, as the agent last reported them. Empty while the agent is not
+  // connected.
+  //
+  // Features are switched on and off only in the guest, never through the API, so that the
+  // machine's owner keeps the last word on what the platform can do in it.
+  repeated Feature features = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+}

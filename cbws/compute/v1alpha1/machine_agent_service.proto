@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package cbws.compute.v1alpha1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+// The request to get the agent of a machine.
+message GetMachineAgentRequest {
+  // Required. The resource name of the agent, such as
+  // `projects/my-project-123/machines/web-1/agent`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/MachineAgent"}
+  ];
+}
