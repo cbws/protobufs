@@ -162,6 +162,41 @@ service ComputeService {
     option (google.api.method_signature) = "name";
   }
 
+  // Makes an image from the disk of a stopped machine. The image appears in
+  // `STATE_CREATING` as soon as the operation starts and becomes
+  // `STATE_READY` when it completes. Copying the disk takes minutes per GB.
+  // Only machines on machine types that support it can be imaged.
+  //
+  // Requires `compute.cbws.cloud/Image/create` on the project and
+  // `compute.cbws.cloud/Machine/createImage` on the source machine.
+  rpc CreateImage(CreateImageRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{parent=projects/*}/images"
+      body: "image"
+    };
+    option (google.api.method_signature) = "parent,image,image_id";
+    option (google.longrunning.operation_info) = {
+      response_type: "Image"
+      metadata_type: "cbws.compute.v1alpha1.CreateImageMetadata"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "create";
+  }
+
+  // Deletes an image made from a machine. Machines built from it keep running,
+  // but cannot be reinstalled from it, and its name can be used again at once.
+  // An image still in `STATE_CREATING` cannot be deleted.
+  rpc DeleteImage(DeleteImageRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {delete: "/v1alpha1/{name=projects/*/images/*}"};
+    option (google.api.method_signature) = "name";
+    option (google.longrunning.operation_info) = {
+      response_type: "google.protobuf.Empty"
+      metadata_type: "cbws.compute.v1alpha1.DeleteImageMetadata"
+    };
+    option (cbws.iam.options.v1alpha1.resource_type) = "Image";
+    option (cbws.iam.options.v1alpha1.action) = "delete";
+  }
+
   // Lists the image families in a project.
   rpc ListImageFamilies(ListImageFamiliesRequest) returns (ListImageFamiliesResponse) {
     option (google.api.http) = {get: "/v1alpha1/{parent=projects/*}/families"};
@@ -620,6 +655,51 @@ message GetImageRequest {
 
   // Optional. Ignored: every image field is always returned.
   google.protobuf.FieldMask read_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The request to make an image from a machine.
+message CreateImageRequest {
+  // Required. The project to hold the image, such as `projects/my-project-123`.
+  // It must be the project of the source machine.
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "projects.cbws.xyz/Project"}
+  ];
+
+  // Required. The id the image is named by, which becomes the last segment of
+  // its name.
+  string image_id = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The image to create. `source_machine` is required and the
+  // machine must be stopped. `family` is optional; a family that does not
+  // exist yet is created.
+  Image image = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateImageMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// The image delete request.
+message DeleteImageRequest {
+  // Required. The resource name of the image, such as
+  // `projects/my-project-123/images/my-image`.
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Image"}
+  ];
+}
+
+message DeleteImageMetadata {
+  // When the operation was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the operation finished, successfully or not. Unset while it runs.
+  google.protobuf.Timestamp end_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // The request to list image families.

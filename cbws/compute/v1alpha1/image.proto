@@ -4,6 +4,7 @@ package cbws.compute.v1alpha1;
 
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
 
 // An operating system image that machines are installed from.
 message Image {
@@ -23,6 +24,44 @@ message Image {
   // `projects/my-project-123/families/ubuntu-2404-lts`. Empty for an image in
   // no family.
   string family = 3 [(google.api.field_behavior) = IMMUTABLE];
+
+  // Whether the image can build machines. Only a `STATE_READY` image can be
+  // named on a machine or picked from its family.
+  State state = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  enum State {
+    STATE_UNSPECIFIED = 0;
+
+    // The image is being made from its source machine.
+    STATE_CREATING = 1;
+
+    // The image can build machines.
+    STATE_READY = 2;
+
+    // Making the image failed. It cannot build machines and can only be deleted.
+    STATE_FAILED = 3;
+
+    // The image is being deleted.
+    STATE_DELETING = 4;
+  }
+
+  // When the image was created. Unset where the time is not known.
+  google.protobuf.Timestamp create_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The machine the image was made from, such as
+  // `projects/my-project/machines/web-1`. Empty for an image that was not made
+  // from a machine. The name stays after the machine is deleted, and may then
+  // name a different machine created later under the same name;
+  // `source_machine_uid` tells the two apart.
+  string source_machine = 6 [
+    (google.api.field_behavior) = IMMUTABLE,
+    (google.api.resource_reference) = {type: "compute.cbws.cloud/Machine"}
+  ];
+
+  // The uid of the machine the image was made from. It matches the
+  // machine's `uid` only while `source_machine` still names that same machine.
+  // Empty for an image that was not made from a machine.
+  string source_machine_uid = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // A named series of images, such as all the images of one operating system
